@@ -3,93 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swipe Map Tool</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="layout.css" />
+    <title>Leaflet Swipe Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        #map {
-            height: 100%;
-            width: 100%;
-        }
-        .leaflet-top.leaflet-left {
-            display: none;
-        }
-        .dropdown {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-        }
+        body, html { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .leaflet-control-layers { display: none; }
+        .leaflet-bar { background-color: rgba(255, 255, 255, 0.8); border-radius: 4px; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1); }
+        .leaflet-bar a { color: #333; display: block; width: 26px; height: 26px; line-height: 26px; text-align: center; text-decoration: none; }
+        .leaflet-bar a:hover { background-color: #f4f4f4; }
+        .leaflet-bar a.disabled { pointer-events: none; color: #aaa; }
     </style>
 </head>
 <body>
-    <div class="dropdown">
-        <label for="yearSelectA">Select Year A:</label>
-        <select id="yearSelectA">
-            <option value="FP_2002.jpg">2002</option>
-            <option value="FP_2006.jpg">2006</option>
-            <option value="FP_2020.jpg">2020</option>
-            <option value="FP_2024.jpg">2024</option>
-        </select>
-        <label for="yearSelectB">Select Year B:</label>
-        <select id="yearSelectB">
-            <option value="FP_2002.jpg">2002</option>
-            <option value="FP_2006.jpg">2006</option>
-            <option value="FP_2020.jpg">2020</option>
-            <option value="FP_2024.jpg" selected>2024</option>
-        </select>
-    </div>
     <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="leaflet-compare.js"></script>
     <script>
-        const mapCenter = [38.6258125, -90.2564375];
-        const mapZoom = 12;
-        const imageDimensions = [8192, 4381]; // Width x Height in pixels
-        const imageBounds = [[0, 0], [imageDimensions[1], imageDimensions[0]]]; // [southWest, northEast]
+        // Initialize Leaflet map
+        var map = L.map('map').setView([38.6258125, -90.2564375], 13);
 
-        let yearA = 'FP_2002.jpg';
-        let yearB = 'FP_2024.jpg';
+        // Add base layer (e.g., OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-        const map = L.map('map', {
-            center: mapCenter,
-            zoom: mapZoom,
-            layers: []
+        // Define the images
+        var imageOptions = [
+            { label: '2002', value: 'FP_2002.jpg' },
+            { label: '2006', value: 'FP_2006.jpg' },
+            { label: '2020', value: 'FP_2020.jpg' },
+            { label: '2024', value: 'FP_2024.jpg' }
+        ];
+
+        // Initialize left and right layers with default images
+        var leftLayer = L.imageOverlay('FP_2002.jpg', map.getBounds()).addTo(map);
+        var rightLayer = L.imageOverlay('FP_2024.jpg', map.getBounds()).addTo(map);
+
+        // Initialize compare control
+        var compareControl = L.control.compare(leftLayer, rightLayer, {
+            position: 'topright',
+            thumbSize: 50,
+            padding: 10,
+            position: 0.5 // Initial position of the divider (0 to 1)
+        }).addTo(map);
+
+        // Create dropdowns for image selection
+        var leftSelect = createDropdown('left-dropdown', imageOptions, 'Select Year', function(e) {
+            leftLayer.setUrl(e.target.value);
         });
 
-        let imageA = L.imageOverlay(yearA, imageBounds);
-        let imageB = L.imageOverlay(yearB, imageBounds);
-
-        imageA.addTo(map);
-        imageB.addTo(map);
-
-        const compare = L.control.compare([imageA], [imageB]).addTo(map);
-
-        map.on('zoomend', function() {
-            const bounds = map.getBounds();
-            imageA.setBounds(bounds);
-            imageB.setBounds(bounds);
+        var rightSelect = createDropdown('right-dropdown', imageOptions, 'Select Year', function(e) {
+            rightLayer.setUrl(e.target.value);
         });
 
-        document.getElementById('yearSelectA').addEventListener('change', function(e) {
-            yearA = e.target.value;
-            imageA.setUrl(yearA);
-            compare._updateClip();
-        });
+        // Add dropdowns to Leaflet control
+        L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-        document.getElementById('yearSelectB').addEventListener('change', function(e) {
-            yearB = e.target.value;
-            imageB.setUrl(yearB);
-            compare._updateClip();
-        });
+        // Function to create dropdown
+        function createDropdown(id, options, defaultText, onChange) {
+            var dropdown = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            dropdown.innerHTML = '<select id="' + id + '" class="leaflet-control-layers leaflet-bar-part">' +
+                                    '<option value="">' + defaultText + '</option>' +
+                                '</select>';
+            dropdown.onmousedown = L.DomEvent.stopPropagation;
+            L.DomEvent.disableClickPropagation(dropdown);
+
+            var select = dropdown.querySelector('select');
+            options.forEach(function(option) {
+                var o = document.createElement('option');
+                o.value = option.value;
+                o.text = option.label;
+                select.appendChild(o);
+            });
+
+            select.addEventListener('change', onChange);
+
+            return dropdown;
+        }
     </script>
 </body>
 </html>
