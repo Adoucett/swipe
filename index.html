@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swipe Map Tool</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-swipe/dist/leaflet-swipe.css" />
     <style>
         html, body {
             height: 100%;
@@ -16,13 +17,6 @@
         }
         .leaflet-top.leaflet-left {
             display: none;
-        }
-        .slider {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
         }
         .dropdown {
             position: absolute;
@@ -53,9 +47,9 @@
         </select>
     </div>
     <div id="map"></div>
-    <input type="range" min="0" max="100" value="50" class="slider" id="slider">
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-swipe/dist/leaflet-swipe.js"></script>
     <script>
         const map = L.map('map', {
             center: [0, 0],
@@ -68,8 +62,14 @@
 
         const imageBounds = [[-90, -180], [90, 180]];
 
-        let imageA = L.imageOverlay(yearA, imageBounds).addTo(map);
-        let imageB = L.imageOverlay(yearB, imageBounds).addTo(map);
+        let imageA = L.imageOverlay(yearA, imageBounds);
+        let imageB = L.imageOverlay(yearB, imageBounds);
+
+        imageA.addTo(map);
+        const swipe = L.control.swipe().addTo(map);
+        imageB.addTo(map);
+        swipe.addOverlay(imageA, 'Layer A');
+        swipe.addOverlay(imageB, 'Layer B');
 
         document.getElementById('yearSelectA').addEventListener('change', function(e) {
             yearA = e.target.value;
@@ -79,12 +79,6 @@
         document.getElementById('yearSelectB').addEventListener('change', function(e) {
             yearB = e.target.value;
             imageB.setUrl(yearB);
-        });
-
-        const slider = document.getElementById('slider');
-        slider.addEventListener('input', function(e) {
-            const value = e.target.value;
-            document.querySelector('.leaflet-pane .leaflet-image-layer').style.clipPath = `polygon(0 0, ${value}% 0, ${value}% 100%, 0 100%)`;
         });
 
         map.on('zoomend', function() {
