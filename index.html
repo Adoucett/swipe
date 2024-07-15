@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swipe Map Tool</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        .leaflet-top.leaflet-left {
+            display: none;
+        }
+        .slider {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        .dropdown {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="dropdown">
+        <label for="yearSelectA">Select Year A:</label>
+        <select id="yearSelectA">
+            <option value="FP_2002.jpg">2002</option>
+            <option value="FP_2006.jpg">2006</option>
+            <option value="FP_2020.jpg">2020</option>
+            <option value="FP_2024.jpg">2024</option>
+        </select>
+        <label for="yearSelectB">Select Year B:</label>
+        <select id="yearSelectB">
+            <option value="FP_2002.jpg">2002</option>
+            <option value="FP_2006.jpg">2006</option>
+            <option value="FP_2020.jpg">2020</option>
+            <option value="FP_2024.jpg">2024</option>
+        </select>
+    </div>
+    <div id="map"></div>
+    <input type="range" min="0" max="100" value="50" class="slider" id="slider">
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.sync/L.Map.Sync.js"></script>
+    <script>
+        const map = L.map('map', {
+            center: [0, 0],
+            zoom: 2,
+            layers: []
+        });
+
+        let yearA = 'FP_2002.jpg';
+        let yearB = 'FP_2024.jpg';
+
+        const imageBounds = [[-90, -180], [90, 180]];
+
+        let imageA = L.imageOverlay(yearA, imageBounds).addTo(map);
+        let imageB = L.imageOverlay(yearB, imageBounds).addTo(map);
+
+        document.getElementById('yearSelectA').addEventListener('change', function(e) {
+            yearA = e.target.value;
+            imageA.setUrl(yearA);
+        });
+
+        document.getElementById('yearSelectB').addEventListener('change', function(e) {
+            yearB = e.target.value;
+            imageB.setUrl(yearB);
+        });
+
+        const slider = document.getElementById('slider');
+        slider.addEventListener('input', function(e) {
+            const value = e.target.value;
+            document.querySelector('.leaflet-pane .leaflet-image-layer').style.clipPath = `polygon(0 0, ${value}% 0, ${value}% 100%, 0 100%)`;
+        });
+
+        map.on('zoomend', function() {
+            const bounds = map.getBounds();
+            imageA.setBounds(bounds);
+            imageB.setBounds(bounds);
+        });
+    </script>
+</body>
+</html>
