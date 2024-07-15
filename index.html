@@ -51,17 +51,19 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="leaflet-compare.js"></script>
     <script>
-        const map = L.map('map', {
-            center: [0, 0],
-            zoom: 2,
-            layers: []
-        });
-
+        const mapCenter = [38.6258125, -90.2564375];
+        const mapZoom = 12;
         const imageDimensions = [8192, 4381]; // Width x Height in pixels
         const imageBounds = [[0, 0], [imageDimensions[1], imageDimensions[0]]]; // [southWest, northEast]
 
         let yearA = 'FP_2002.jpg';
         let yearB = 'FP_2024.jpg';
+
+        const map = L.map('map', {
+            center: mapCenter,
+            zoom: mapZoom,
+            layers: []
+        });
 
         let imageA = L.imageOverlay(yearA, imageBounds);
         let imageB = L.imageOverlay(yearB, imageBounds);
@@ -71,7 +73,11 @@
 
         const compare = L.control.compare([imageA], [imageB]).addTo(map);
 
-        map.fitBounds(imageBounds); // Fit the map to the image bounds
+        map.on('zoomend', function() {
+            const bounds = map.getBounds();
+            imageA.setBounds(bounds);
+            imageB.setBounds(bounds);
+        });
 
         document.getElementById('yearSelectA').addEventListener('change', function(e) {
             yearA = e.target.value;
@@ -83,12 +89,6 @@
             yearB = e.target.value;
             imageB.setUrl(yearB);
             compare._updateClip();
-        });
-
-        map.on('zoomend', function() {
-            const bounds = map.getBounds();
-            imageA.setBounds(bounds);
-            imageB.setBounds(bounds);
         });
     </script>
 </body>
