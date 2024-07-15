@@ -60,7 +60,7 @@ L.Control.Compare = L.Control.extend({
         this._leftLayers = asArray(leftLayers);
         this._rightLayers = asArray(rightLayers);
         this._updateClip();
-        L.setOptions(this, options);
+        L.Util.setOptions(this, options);
     },
 
     getPosition() {
@@ -82,61 +82,50 @@ L.Control.Compare = L.Control.extend({
 
     includes: L.Evented.prototype,
 
-    addTo(map) {
+    onAdd(map) {
         this.remove();
         this._map = map;
         this._container = L.DomUtil.create(
             "div",
             "leaflet-sbs",
-            // eslint-disable-next-line no-underscore-dangle
-            map._controlContainer,
+            map.getContainer()
         );
         this._divider = L.DomUtil.create(
             "div",
             "leaflet-sbs-divider",
-            this._container,
+            this._container
         );
         this._range = L.DomUtil.create(
             "input",
             "leaflet-sbs-range",
-            this._container,
+            this._container
         );
         this._range.type = "range";
         this._range.min = 0;
         this._range.max = 1;
         this._range.step = "any";
         this._range.value = 0.5;
-        // eslint-disable-next-line no-multi-assign
         this._range.style.paddingLeft = this._range.style.paddingRight = `${this.options.padding}px`;
         this._addEvents();
         this._updateClip();
         if (this.options.position) {
             this.setPosition(this.options.position);
         }
-        return this;
+        return this._container;
     },
 
-    remove() {
+    onRemove() {
         if (!this._map) {
             return this;
         }
         this._leftLayers.forEach(leftLayer => {
-            if (leftLayer.getContainer) {
-                leftLayer.getContainer().style.clip = "";
-            } else {
-                leftLayer.getPane().style.clip = "";
-            }
+            leftLayer.getContainer().style.clip = "";
         });
 
         this._rightLayers.forEach(rightLayer => {
-            if (rightLayer.getContainer) {
-                rightLayer.getContainer().style.clip = "";
-            } else {
-                rightLayer.getPane().style.clip = "";
-            }
+            rightLayer.getContainer().style.clip = "";
         });
         this._removeEvents();
-        L.DomUtil.remove(this._container);
         this._map = null;
         return this;
     },
@@ -156,19 +145,11 @@ L.Control.Compare = L.Control.extend({
         const clipRight = `rect(${[nw.y, se.x, se.y, clipX].join("px,")}px)`;
 
         this._leftLayers.forEach(leftLayer => {
-            if (leftLayer.getContainer) {
-                leftLayer.getContainer().style.clip = clipLeft;
-            } else {
-                leftLayer.getPane().style.clip = clipLeft;
-            }
+            leftLayer.getContainer().style.clip = clipLeft;
         });
 
         this._rightLayers.forEach(rightLayer => {
-            if (rightLayer.getContainer) {
-                rightLayer.getContainer().style.clip = clipRight;
-            } else {
-                rightLayer.getPane().style.clip = clipRight;
-            }
+            rightLayer.getContainer().style.clip = clipRight;
         });
         return this;
     },
@@ -184,13 +165,13 @@ L.Control.Compare = L.Control.extend({
             range,
             L.Browser.touch ? "touchstart" : "mousedown",
             cancelMapDrag,
-            this,
+            this
         );
         on(
             range,
             L.Browser.touch ? "touchend" : "mouseup",
             uncancelMapDrag,
-            this,
+            this
         );
     },
 
@@ -203,13 +184,13 @@ L.Control.Compare = L.Control.extend({
                 range,
                 L.Browser.touch ? "touchstart" : "mousedown",
                 cancelMapDrag,
-                this,
+                this
             );
             off(
                 range,
                 L.Browser.touch ? "touchend" : "mouseup",
                 uncancelMapDrag,
-                this,
+                this
             );
         }
         if (map) {
@@ -223,5 +204,5 @@ L.control.compare = function (leftLayers, rightLayers, options) {
     return new L.Control.Compare(leftLayers, rightLayers, options);
 };
 
-export const { Compare } = L.Control;
-export default Compare;
+export const { Compare } = L.Control.Compare;
+export default L.Control.Compare;
