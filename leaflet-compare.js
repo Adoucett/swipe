@@ -3,22 +3,22 @@ import L from "leaflet";
 let mapWasDragEnabled;
 let mapWasTapEnabled;
 
-// Leaflet v0.7 backwards compatibility
+// Leaflet v1.8.0 onwards compatibility
 function on(el, types, fn, context) {
     types.split(" ").forEach(type => {
-        L.DomEvent.on(el, type, fn, context);
+        el.addEventListener(type, fn, context);
     });
 }
 
-// Leaflet v0.7 backwards compatibility
+// Leaflet v1.8.0 onwards compatibility
 function off(el, types, fn, context) {
     types.split(" ").forEach(type => {
-        L.DomEvent.off(el, type, fn, context);
+        el.removeEventListener(type, fn, context);
     });
 }
 
 function getRangeEvent(rangeInput) {
-    return "oninput" in rangeInput ? "input" : "change";
+    return "input";
 }
 
 function cancelMapDrag() {
