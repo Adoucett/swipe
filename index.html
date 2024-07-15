@@ -43,7 +43,7 @@
             <option value="FP_2002.jpg">2002</option>
             <option value="FP_2006.jpg">2006</option>
             <option value="FP_2020.jpg">2020</option>
-            <option value="FP_2024.jpg">2024</option>
+            <option value="FP_2024.jpg" selected>2024</option>
         </select>
     </div>
     <div id="map"></div>
@@ -57,10 +57,11 @@
             layers: []
         });
 
+        const imageDimensions = [8192, 4381]; // Width x Height in pixels
+        const imageBounds = [[0, 0], [imageDimensions[1], imageDimensions[0]]]; // [southWest, northEast]
+
         let yearA = 'FP_2002.jpg';
         let yearB = 'FP_2024.jpg';
-
-        const imageBounds = [[-90, -180], [90, 180]];
 
         let imageA = L.imageOverlay(yearA, imageBounds);
         let imageB = L.imageOverlay(yearB, imageBounds);
@@ -69,6 +70,8 @@
         imageB.addTo(map);
 
         const compare = L.control.compare([imageA], [imageB]).addTo(map);
+
+        map.fitBounds(imageBounds); // Fit the map to the image bounds
 
         document.getElementById('yearSelectA').addEventListener('change', function(e) {
             yearA = e.target.value;
