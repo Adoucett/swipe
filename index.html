@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swipe Map Tool</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="layout.css" />
+    <link rel="stylesheet" href="leaflet-compare.css" />
     <style>
         html, body {
             height: 100%;
@@ -49,7 +49,7 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="leaflet-side-by-side.js"></script>
+    <script src="leaflet-compare.js"></script>
     <script>
         const map = L.map('map', {
             center: [0, 0],
@@ -66,19 +66,20 @@
         let imageB = L.imageOverlay(yearB, imageBounds);
 
         imageA.addTo(map);
-        const swipe = L.control.swipe().addTo(map);
         imageB.addTo(map);
-        swipe.addOverlay(imageA, 'Layer A');
-        swipe.addOverlay(imageB, 'Layer B');
+
+        const compare = L.control.compare([imageA], [imageB]).addTo(map);
 
         document.getElementById('yearSelectA').addEventListener('change', function(e) {
             yearA = e.target.value;
             imageA.setUrl(yearA);
+            compare._updateClip();
         });
 
         document.getElementById('yearSelectB').addEventListener('change', function(e) {
             yearB = e.target.value;
             imageB.setUrl(yearB);
+            compare._updateClip();
         });
 
         map.on('zoomend', function() {
