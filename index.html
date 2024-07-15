@@ -29,6 +29,9 @@
             top: 10px;
             left: 10px;
             z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -53,7 +56,6 @@
     <input type="range" min="0" max="100" value="50" class="slider" id="slider">
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.sync/L.Map.Sync.js"></script>
     <script>
         const map = L.map('map', {
             center: [0, 0],
