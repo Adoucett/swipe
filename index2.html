@@ -157,14 +157,14 @@
             imgA.onload = () => {
                 let bounds = [[0, 0], [imgA.height, imgA.width]];
                 overlayA = L.imageOverlay(imageA, bounds).addTo(map);
-                overlayA.setOpacity(1);
+                overlayA.setOpacity(1); // Ensure opacity is set to 1 initially
                 map.fitBounds(bounds);
 
                 imgB = new Image();
                 imgB.src = imageB;
                 imgB.onload = () => {
                     overlayB = L.imageOverlay(imageB, bounds).addTo(map);
-                    overlayB.setOpacity(0.5);
+                    overlayB.setOpacity(0.5); // Ensure opacity is set to 0.5 initially
                     updateClip();
                 };
             };
