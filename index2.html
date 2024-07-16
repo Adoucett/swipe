@@ -5,18 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Compare Tool</title>
     <style>
+        :root {
+            --background-color: #f0f0f0;
+            --font-family: Arial, sans-serif;
+            --primary-color: #333;
+            --border-color: #ccc;
+            --slider-width: 4px;
+            --slider-handle-size: 20px;
+            --slider-handle-color: #fff;
+            --slider-handle-border: 2px solid #000;
+            --zoom-button-bg: #fff;
+            --zoom-button-border: 1px solid #000;
+        }
         body, html {
             height: 100%;
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: var(--font-family);
             overflow: hidden;
             user-select: none;
-            background-color: #f0f0f0;
+            background-color: var(--background-color);
         }
         .container {
             position: relative;
             height: 100%;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .img-container {
             height: 100%;
@@ -33,6 +49,7 @@
             height: 100%;
             width: 100%;
             transform-origin: top left;
+            transition: clip 0.3s ease;
         }
         .imgA {
             clip: rect(0px, 50vw, 100vh, 0px);
@@ -41,21 +58,22 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 4px;
-            background-color: #fff;
+            width: var(--slider-width);
+            background-color: var(--slider-handle-color);
             cursor: ew-resize;
             z-index: 100;
+            transition: left 0.3s ease;
         }
-        .slider:before {
+        .slider::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            background-color: #fff;
-            border: 2px solid #000;
+            width: var(--slider-handle-size);
+            height: var(--slider-handle-size);
+            background-color: var(--slider-handle-color);
+            border: var(--slider-handle-border);
             border-radius: 50%;
             z-index: 101;
         }
@@ -65,15 +83,15 @@
             left: 10px;
             z-index: 200;
             font-size: 1.2em;
-            color: #333;
+            color: var(--primary-color);
         }
         .dropdown {
             margin: 0 5px;
             padding: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
             border-radius: 5px;
-            background-color: #fff;
-            color: #333;
+            background-color: var(--zoom-button-bg);
+            color: var(--primary-color);
         }
         .zoom-container {
             position: absolute;
@@ -81,16 +99,16 @@
             right: 10px;
             z-index: 200;
             font-size: 1.2em;
-            color: #333;
+            color: var(--primary-color);
         }
         .zoom-button {
             margin: 0 5px;
             padding: 5px 10px;
-            background-color: #fff;
-            border: 1px solid #000;
+            background-color: var(--zoom-button-bg);
+            border: var(--zoom-button-border);
             cursor: pointer;
             border-radius: 3px;
-            color: #333;
+            color: var(--primary-color);
         }
         .loading-indicator {
             position: absolute;
@@ -99,35 +117,35 @@
             transform: translate(-50%, -50%);
             display: none;
             font-size: 1.5em;
-            color: #333;
+            color: var(--primary-color);
         }
     </style>
 </head>
 <body>
-    <div class="container" id="image-compare-container">
+    <div class="container" id="image-compare-container" role="main">
         <div class="img-container">
-            <img id="imgB" src="FP_2024.jpg" class="img">
+            <img id="imgB" src="FP_2024.jpg" class="img" loading="lazy" alt="Image B">
         </div>
         <div class="img-container">
-            <img id="imgA" src="FP_2002.jpg" class="img imgA">
+            <img id="imgA" src="FP_2002.jpg" class="img imgA" loading="lazy" alt="Image A">
         </div>
         <div class="slider" id="slider" style="left: 50%;"></div>
         <div class="dropdown-container">
             <label for="dataset">Dataset:</label>
-            <select id="dataset" class="dropdown">
+            <select id="dataset" class="dropdown" aria-label="Dataset selector">
                 <option value="FP">Forest Park South East</option>
                 <option value="BH">Botanical Heights</option>
                 <option value="North">North City</option>
                 <option value="BR">Bridgeton</option>
             </select>
-            <select id="selectA" class="dropdown"></select>
-            <select id="selectB" class="dropdown"></select>
+            <select id="selectA" class="dropdown" aria-label="Image A selector"></select>
+            <select id="selectB" class="dropdown" aria-label="Image B selector"></select>
         </div>
         <div class="zoom-container">
-            <button id="zoom-in" class="zoom-button">Zoom In</button>
-            <button id="zoom-out" class="zoom-button">Zoom Out</button>
+            <button id="zoom-in" class="zoom-button" aria-label="Zoom In">Zoom In</button>
+            <button id="zoom-out" class="zoom-button" aria-label="Zoom Out">Zoom Out</button>
         </div>
-        <div class="loading-indicator" id="loading-indicator">Loading...</div>
+        <div class="loading-indicator" id="loading-indicator" role="status">Loading...</div>
     </div>
 
     <script>
@@ -188,22 +206,20 @@
             document.removeEventListener('mouseup', onStopDrag);
         }
 
-        selectA.addEventListener('change', (e) => {
-            showLoadingIndicator();
-            imgA.src = e.target.value;
-            imgA.onload = hideLoadingIndicator;
-            imgA.onerror = hideLoadingIndicator;
-        });
-
-        selectB.addEventListener('change', (e) => {
-            showLoadingIndicator();
-            imgB.src = e.target.value;
-            imgB.onload = hideLoadingIndicator;
-            imgB.onerror = hideLoadingIndicator;
-        });
-
-        dataset.addEventListener('change', (e) => {
-            updateDropdowns(e.target.value);
+        container.addEventListener('change', (e) => {
+            if (e.target === selectA) {
+                showLoadingIndicator();
+                imgA.src = e.target.value;
+                imgA.onload = hideLoadingIndicator;
+                imgA.onerror = hideLoadingIndicator;
+            } else if (e.target === selectB) {
+                showLoadingIndicator();
+                imgB.src = e.target.value;
+                imgB.onload = hideLoadingIndicator;
+                imgB.onerror = hideLoadingIndicator;
+            } else if (e.target === dataset) {
+                updateDropdowns(e.target.value);
+            }
         });
 
         container.addEventListener('wheel', (e) => {
