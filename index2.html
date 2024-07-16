@@ -133,8 +133,8 @@ let map = L.map('map', {
   center: [0, 0],
   zoom: 1,
   crs: L.CRS.Simple,
-  minZoom: -5, // Adjust minZoom if necessary
-  maxZoom: 10, // Adjust maxZoom according to your needs
+  minZoom: -5,
+  maxZoom: 10,
   zoomControl: false
 });
 
@@ -169,10 +169,10 @@ function loadImages(imageA, imageB) {
     let bounds = [[0, 0], [imgA.height, imgA.width]];
 
     overlayA = L.imageOverlay(imageA, bounds).addTo(map);
-    overlayA.setOpacity(1); // Ensure opacity is set to 1 initially
+    overlayA.setOpacity(1);
 
     overlayB = L.imageOverlay(imageB, bounds).addTo(map);
-    overlayB.setOpacity(1); // Ensure opacity is set to 1 initially
+    overlayB.setOpacity(1);
 
     updateClip();
   });
