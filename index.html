@@ -3,39 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Compare Tool</title>
+    <title>Map Compare Tool</title>
     <style>
         body, html {
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
         .container {
             position: relative;
             height: 100%;
+            width: 100%;
         }
         .img-container {
             height: 100%;
             width: 100%;
             overflow: hidden;
             position: absolute;
+            top: 0;
+            left: 0;
         }
         .img {
             position: absolute;
             top: 0;
             left: 0;
             height: 100%;
-            width: auto;
+            width: 100%;
             transition: left 0.4s ease-in-out;
         }
         .slider {
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 2px;
+            width: 4px;
             background-color: #fff;
             cursor: ew-resize;
             z-index: 100;
+        }
+        .slider:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%;
+            z-index: 101;
         }
         .dropdown-container {
             position: absolute;
@@ -45,12 +62,6 @@
         }
         .dropdown {
             margin: 0 5px;
-        }
-        .zoom-container {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            z-index: 200;
         }
     </style>
 </head>
@@ -74,12 +85,8 @@
                 <option value="FP_2002.jpg">2002</option>
                 <option value="FP_2006.jpg">2006</option>
                 <option value="FP_2020.jpg">2020</option>
-                <option value="FP_2024.jpg">2024</option>
+                <option value="FP_2024.jpg" selected>2024</option>
             </select>
-        </div>
-        <div class="zoom-container">
-            <button id="zoom-in">Zoom In</button>
-            <button id="zoom-out">Zoom Out</button>
         </div>
     </div>
 
@@ -90,8 +97,6 @@
         const imgB = document.getElementById('imgB');
         const selectA = document.getElementById('selectA');
         const selectB = document.getElementById('selectB');
-        const zoomInBtn = document.getElementById('zoom-in');
-        const zoomOutBtn = document.getElementById('zoom-out');
 
         let startX = 0;
         let active = false;
@@ -124,18 +129,12 @@
             imgB.src = e.target.value;
         });
 
-        function zoom(scale) {
-            zoomLevel = Math.max(1, zoomLevel + scale);
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoomLevel += e.deltaY * -0.001;
+            zoomLevel = Math.min(Math.max(1, zoomLevel), 5);
             imgA.style.transform = `scale(${zoomLevel})`;
             imgB.style.transform = `scale(${zoomLevel})`;
-        }
-
-        zoomInBtn.addEventListener('click', () => {
-            zoom(0.1);
-        });
-
-        zoomOutBtn.addEventListener('click', () => {
-            zoom(-0.1);
         });
     </script>
 </body>
