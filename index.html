@@ -10,6 +10,7 @@
             margin: 0;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            user-select: none; /* Prevent image selection */
         }
         .container {
             position: relative;
@@ -66,6 +67,20 @@
         .dropdown {
             margin: 0 5px;
         }
+        .zoom-container {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 200;
+        }
+        .zoom-button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #fff;
+            border: 1px solid #000;
+            cursor: pointer;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -91,6 +106,10 @@
                 <option value="FP_2024.jpg" selected>2024</option>
             </select>
         </div>
+        <div class="zoom-container">
+            <button id="zoom-in" class="zoom-button">Zoom In</button>
+            <button id="zoom-out" class="zoom-button">Zoom Out</button>
+        </div>
     </div>
 
     <script>
@@ -100,6 +119,8 @@
         const imgB = document.getElementById('imgB');
         const selectA = document.getElementById('selectA');
         const selectB = document.getElementById('selectB');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
 
         let startX = 0;
         let active = false;
@@ -138,6 +159,18 @@
             e.preventDefault();
             zoomLevel += e.deltaY * -0.01;
             zoomLevel = Math.min(Math.max(1, zoomLevel), 5);
+            imgA.style.transform = `scale(${zoomLevel})`;
+            imgB.style.transform = `scale(${zoomLevel})`;
+        });
+
+        zoomInBtn.addEventListener('click', () => {
+            zoomLevel = Math.min(zoomLevel + 0.1, 5);
+            imgA.style.transform = `scale(${zoomLevel})`;
+            imgB.style.transform = `scale(${zoomLevel})`;
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            zoomLevel = Math.max(zoomLevel - 0.1, 1);
             imgA.style.transform = `scale(${zoomLevel})`;
             imgB.style.transform = `scale(${zoomLevel})`;
         });
