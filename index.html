@@ -1,136 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Compare Tool</title>
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            user-select: none; /* Prevent image selection */
-            background-color: #f0f0f0; /* Light background for better contrast */
-        }
-        .container {
-            position: relative;
-            height: 100%;
-            width: 100%;
-        }
-        .img-container {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        .img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            transform-origin: top left;
-        }
-        .imgA {
-            clip: rect(0px, 50vw, 100vh, 0px);
-        }
-        .slider {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: #fff;
-            cursor: ew-resize;
-            z-index: 100;
-        }
-        .slider:before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            background-color: #fff;
-            border: 2px solid #000;
-            border-radius: 50%;
-            z-index: 101;
-        }
-        .dropdown-container {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 200;
-            font-size: 1.2em;
-            color: #333; /* Darker font color for better readability */
-        }
-        .dropdown {
-            margin: 0 5px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            color: #333;
-        }
-        .zoom-container {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            z-index: 200;
-            font-size: 1.2em;
-            color: #333;
-        }
-        .zoom-button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            background-color: #fff;
-            border: 1px solid #000;
-            cursor: pointer;
-            border-radius: 3px;
-            color: #333;
-        }
-    </style>
-</head>
-<body>
-    <div class="container" id="image-compare-container">
-        <div class="img-container">
-            <img id="imgB" src="FP_2024.jpg" class="img">
-        </div>
-        <div class="img-container">
-            <img id="imgA" src="FP_2002.jpg" class="img imgA">
-        </div>
-        <div class="slider" id="slider" style="left: 50%;"></div>
-        <div class="dropdown-container">
-            <label for="dataset">Dataset:</label>
-            <select id="dataset" class="dropdown">
-                <option value="FP">FP</option>
-                <option value="CWE">CWE</option>
-                <option value="North">North</option>
-            </select>
-            <select id="selectA" class="dropdown">
-                <option value="FP_2002.jpg">2002</option>
-                <option value="FP_2006.jpg">2006</option>
-                <option value="FP_2020.jpg">2020</option>
-                <option value="FP_2024.jpg">2024</option>
-            </select>
-            <select id="selectB" class="dropdown">
-                <option value="FP_2002.jpg">2002</option>
-                <option value="FP_2006.jpg">2006</option>
-                <option value="FP_2020.jpg">2020</option>
-                <option value="FP_2024.jpg" selected>2024</option>
-            </select>
-        </div>
-        <div class="zoom-container">
-            <button id="zoom-in" class="zoom-button">Zoom In</button>
-            <button id="zoom-out" class="zoom-button">Zoom Out</button>
-        </div>
-    </div>
-
-    <script>
-        const container = document.getElementById('image-compare-container');
+<!doctypehtml><html lang=en><meta charset=UTF-8><meta content="width=device-width,initial-scale=1"name=viewport><title>Image Compare Tool</title><style>body,html{height:100%;margin:0;font-family:Arial,sans-serif;overflow:hidden;user-select:none;background-color:#f0f0f0}.container{position:relative;height:100%;width:100%}.img-container{height:100%;width:100%;overflow:hidden;position:absolute;top:0;left:0}.img{position:absolute;top:0;left:0;height:100%;width:100%;transform-origin:top left}.imgA{clip:rect(0,50vw,100vh,0)}.slider{position:absolute;top:0;bottom:0;width:4px;background-color:#fff;cursor:ew-resize;z-index:100}.slider:before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;background-color:#fff;border:2px solid #000;border-radius:50%;z-index:101}.dropdown-container{position:absolute;top:10px;left:10px;z-index:200;font-size:1.2em;color:#333}.dropdown{margin:0 5px;padding:5px;border:1px solid #ccc;border-radius:5px;background-color:#fff;color:#333}.zoom-container{position:absolute;bottom:10px;right:10px;z-index:200;font-size:1.2em;color:#333}.zoom-button{margin:0 5px;padding:5px 10px;background-color:#fff;border:1px solid #000;cursor:pointer;border-radius:3px;color:#333}</style><div class=container id=image-compare-container><div class=img-container><img class=img id=imgB src=FP_2024.jpg></div><div class=img-container><img class="img imgA"id=imgA src=FP_2002.jpg></div><div class=slider id=slider style=left:50%></div><div class=dropdown-container><label for=dataset>Dataset:</label> <select class=dropdown id=dataset><option value=FP>FP<option value=CWE>CWE<option value=North>North</select> <select class=dropdown id=selectA><option value=FP_2002.jpg>2002<option value=FP_2006.jpg>2006<option value=FP_2020.jpg>2020<option value=FP_2024.jpg>2024</select> <select class=dropdown id=selectB><option value=FP_2002.jpg>2002<option value=FP_2006.jpg>2006<option value=FP_2020.jpg>2020<option value=FP_2024.jpg selected>2024</select></div><div class=zoom-container><button class=zoom-button id=zoom-in>Zoom In</button> <button class=zoom-button id=zoom-out>Zoom Out</button></div></div><script>const container = document.getElementById('image-compare-container');
         const slider = document.getElementById('slider');
         const imgA = document.getElementById('imgA');
         const imgB = document.getElementById('imgB');
@@ -233,11 +101,13 @@
         }
 
         container.addEventListener('mousedown', (e) => {
-            active = true;
-            startX = e.clientX - panX;
-            startY = e.clientY - panY;
-            document.addEventListener('mousemove', onPan);
-            document.addEventListener('mouseup', onStopPan);
+            if (e.target !== slider) {
+                active = true;
+                startX = e.clientX - panX;
+                startY = e.clientY - panY;
+                document.addEventListener('mousemove', onPan);
+                document.addEventListener('mouseup', onStopPan);
+            }
         });
 
         function onPan(e) {
@@ -262,7 +132,4 @@
             imgA.style.clip = `rect(0, ${sliderPosition * 100}vw, 100vh, 0)`;
         }
 
-        updateClip();
-    </script>
-</body>
-</html>
+        updateClip();</script>
