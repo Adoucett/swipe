@@ -133,8 +133,8 @@ let map = L.map('map', {
   center: [0, 0],
   zoom: 1,
   crs: L.CRS.Simple,
-  minZoom: -5,
-  maxZoom: 10,
+  minZoom: -5, // Adjust minZoom if necessary
+  maxZoom: 10, // Adjust maxZoom according to your needs
   zoomControl: false
 });
 
@@ -142,57 +142,70 @@ let imgA, imgB;
 let overlayA, overlayB;
 let sliderPosition = 0.5;
 
+function preloadImages(imageA, imageB, callback) {
+  let loaded = 0;
+
+  function imageLoaded() {
+    loaded++;
+    if (loaded === 2) {
+      callback();
+    }
+  }
+
+  imgA = new Image();
+  imgA.onload = imageLoaded;
+  imgA.src = imageA;
+
+  imgB = new Image();
+  imgB.onload = imageLoaded;
+  imgB.src = imageB;
+}
+
+function loadImages(imageA, imageB) {
+  preloadImages(imageA, imageB, () => {
+    if (overlayA) map.removeLayer(overlayA);
+    if (overlayB) map.removeLayer(overlayB);
+
+    let bounds = [[0, 0], [imgA.height, imgA.width]];
+
+    overlayA = L.imageOverlay(imageA, bounds).addTo(map);
+    overlayA.setOpacity(1); // Ensure opacity is set to 1 initially
+
+    overlayB = L.imageOverlay(imageB, bounds).addTo(map);
+    overlayB.setOpacity(1); // Ensure opacity is set to 1 initially
+
+    updateClip();
+  });
+}
+
+slider.addEventListener('mousedown', (e) => {
+  document.addEventListener('mousemove', moveSlider);
+  document.addEventListener('mouseup', stopSlider);
+});
+
+function moveSlider(e) {
+  let x = e.clientX - container.offsetLeft;
+  x = Math.max(0, Math.min(x, container.offsetWidth));
+  sliderPosition = x / container.offsetWidth;
+  slider.style.left = `${sliderPosition * 100}%`;
+  updateClip();
+}
+
+function stopSlider() {
+  document.removeEventListener('mousemove', moveSlider);
+  document.removeEventListener('mouseup', stopSlider);
+}
+
+function updateClip() {
+  let x = sliderPosition * map.getSize().x;
+  overlayA.getElement().style.clip = `rect(0, ${x}px, ${map.getSize().y}px, 0)`;
+  overlayB.getElement().style.clip = `rect(0, ${map.getSize().x}px, ${map.getSize().y}px, ${x}px)`;
+}
+
 function updateDropdowns(dataset) {
   selectA.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
   selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
   loadImages(`${dataset}_2002.jpg`, `${dataset}_2024.jpg`);
-}
-
-function loadImages(imageA, imageB) {
-  if (overlayA) map.removeLayer(overlayA);
-  if (overlayB) map.removeLayer(overlayB);
-
-  imgA = new Image();
-  imgA.src = imageA;
-  imgA.onload = () => {
-    let bounds = [[0, 0], [imgA.height, imgA.width]];
-    overlayA = L.imageOverlay(imageA, bounds).addTo(map);
-    overlayA.setOpacity(1); // Ensure opacity is set to 1 initially
-    map.fitBounds(bounds);
-
-    imgB = new Image();
-    imgB.src = imageB;
-    imgB.onload = () => {
-      overlayB = L.imageOverlay(imageB, bounds).addTo(map);
-      overlayB.setOpacity(1); // Ensure opacity is set to 1 initially
-      updateClip();
-    };
-  };
-}
-
-slider.addEventListener('mousedown', (e) => {
-  document.onmousemove = (e) => {
-    let x = e.clientX - container.offsetLeft;
-    x = Math.max(0, Math.min(x, container.offsetWidth));
-    sliderPosition = x / container.offsetWidth;
-    slider.style.left = `${sliderPosition * 100}%`;
-    updateClip();
-  };
-  document.onmouseup = () => {
-    document.onmousemove = null;
-    document.onmouseup = null;
-  };
-});
-
-function updateClip() {
-  let bounds = map.getBounds();
-  let x = sliderPosition * map.getSize().x;
-  let west = bounds.getWest();
-  let east = bounds.getEast();
-  let clipX = west + (x / map.getSize().x) * (east - west);
-
-  overlayA.getElement().style.clip = `rect(${bounds.getSouth()}px, ${clipX}px, ${bounds.getNorth()}px, ${bounds.getWest()}px)`;
-  overlayB.getElement().style.clip = `rect(${bounds.getSouth()}px, ${bounds.getEast()}px, ${bounds.getNorth()}px, ${clipX}px)`;
 }
 
 container.addEventListener('change', (e) => {
