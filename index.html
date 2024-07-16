@@ -10,7 +10,6 @@
             margin: 0;
             font-family: Arial, sans-serif;
             overflow: hidden;
-            user-select: none; /* Prevent image selection */
         }
         .container {
             position: relative;
@@ -63,23 +62,17 @@
             top: 10px;
             left: 10px;
             z-index: 200;
+            font-size: 1.2em;
         }
         .dropdown {
             margin: 0 5px;
         }
-        .zoom-container {
+        .menu-container {
             position: absolute;
-            bottom: 10px;
+            top: 10px;
             right: 10px;
             z-index: 200;
-        }
-        .zoom-button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            background-color: #fff;
-            border: 1px solid #000;
-            cursor: pointer;
-            border-radius: 3px;
+            font-size: 1.2em;
         }
     </style>
 </head>
@@ -106,9 +99,12 @@
                 <option value="FP_2024.jpg" selected>2024</option>
             </select>
         </div>
-        <div class="zoom-container">
-            <button id="zoom-in" class="zoom-button">Zoom In</button>
-            <button id="zoom-out" class="zoom-button">Zoom Out</button>
+        <div class="menu-container">
+            <select id="imageSet" class="dropdown">
+                <option value="FP">FP</option>
+                <option value="CWE">CWE</option>
+                <option value="North">North</option>
+            </select>
         </div>
     </div>
 
@@ -119,8 +115,7 @@
         const imgB = document.getElementById('imgB');
         const selectA = document.getElementById('selectA');
         const selectB = document.getElementById('selectB');
-        const zoomInBtn = document.getElementById('zoom-in');
-        const zoomOutBtn = document.getElementById('zoom-out');
+        const imageSet = document.getElementById('imageSet');
 
         let startX = 0;
         let active = false;
@@ -161,19 +156,30 @@
             zoomLevel = Math.min(Math.max(1, zoomLevel), 5);
             imgA.style.transform = `scale(${zoomLevel})`;
             imgB.style.transform = `scale(${zoomLevel})`;
+            syncSliderPosition();
         });
 
-        zoomInBtn.addEventListener('click', () => {
-            zoomLevel = Math.min(zoomLevel + 0.1, 5);
-            imgA.style.transform = `scale(${zoomLevel})`;
-            imgB.style.transform = `scale(${zoomLevel})`;
+        function syncSliderPosition() {
+            const sliderPosition = parseFloat(slider.style.left) / container.offsetWidth;
+            imgA.style.clip = `rect(0px, ${sliderPosition * container.offsetWidth}px, 100vh, 0px)`;
+        }
+
+        imageSet.addEventListener('change', (e) => {
+            const set = e.target.value;
+            selectA.innerHTML = getOptions(set);
+            selectB.innerHTML = getOptions(set);
+            imgA.src = `${set}_2002.jpg`;
+            imgB.src = `${set}_2024.jpg`;
         });
 
-        zoomOutBtn.addEventListener('click', () => {
-            zoomLevel = Math.max(zoomLevel - 0.1, 1);
-            imgA.style.transform = `scale(${zoomLevel})`;
-            imgB.style.transform = `scale(${zoomLevel})`;
-        });
+        function getOptions(set) {
+            return `
+                <option value="${set}_2002.jpg">2002</option>
+                <option value="${set}_2006.jpg">2006</option>
+                <option value="${set}_2020.jpg">2020</option>
+                <option value="${set}_2024.jpg">2024</option>
+            `;
+        }
     </script>
 </body>
 </html>
