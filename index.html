@@ -142,7 +142,7 @@
 
         function updateDropdowns(dataset) {
             selectA.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
-            selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
+            selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
             imgA.src = `${dataset}_2002.jpg`;
             imgB.src = `${dataset}_2024.jpg`;
         }
