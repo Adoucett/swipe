@@ -185,9 +185,14 @@ slider.addEventListener('mousedown', (e) => {
 });
 
 function updateClip() {
+  let bounds = map.getBounds();
   let x = sliderPosition * map.getSize().x;
-  overlayA.getElement().style.clip = `rect(0, ${x}px, ${map.getSize().y}px, 0)`;
-  overlayB.getElement().style.clip = `rect(0, ${map.getSize().x}px, ${map.getSize().y}px, ${x}px)`;
+  let west = bounds.getWest();
+  let east = bounds.getEast();
+  let clipX = west + (x / map.getSize().x) * (east - west);
+
+  overlayA.getElement().style.clip = `rect(${bounds.getSouth()}px, ${clipX}px, ${bounds.getNorth()}px, ${bounds.getWest()}px)`;
+  overlayB.getElement().style.clip = `rect(${bounds.getSouth()}px, ${bounds.getEast()}px, ${bounds.getNorth()}px, ${clipX}px)`;
 }
 
 container.addEventListener('change', (e) => {
