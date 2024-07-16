@@ -10,8 +10,8 @@
             margin: 0;
             font-family: Arial, sans-serif;
             overflow: hidden;
-            user-select: none; /* Prevent image selection */
-            background-color: #f0f0f0; /* Light background for better contrast */
+            user-select: none;
+            background-color: #f0f0f0;
         }
         .container {
             position: relative;
@@ -65,7 +65,7 @@
             left: 10px;
             z-index: 200;
             font-size: 1.2em;
-            color: #333; /* Darker font color for better readability */
+            color: #333;
         }
         .dropdown {
             margin: 0 5px;
@@ -106,22 +106,13 @@
         <div class="dropdown-container">
             <label for="dataset">Dataset:</label>
             <select id="dataset" class="dropdown">
-                <option value="FP">FP</option>
-                <option value="CWE">CWE</option>
-                <option value="North">North</option>
+                <option value="FP">Forest Park South East</option>
+                <option value="BH">Botanical Heights</option>
+                <option value="North">North City</option>
+                <option value="BR">Bridgeton</option>
             </select>
-            <select id="selectA" class="dropdown">
-                <option value="FP_2002.jpg">2002</option>
-                <option value="FP_2006.jpg">2006</option>
-                <option value="FP_2020.jpg">2020</option>
-                <option value="FP_2024.jpg">2024</option>
-            </select>
-            <select id="selectB" class="dropdown">
-                <option value="FP_2002.jpg">2002</option>
-                <option value="FP_2006.jpg">2006</option>
-                <option value="FP_2020.jpg">2020</option>
-                <option value="FP_2024.jpg" selected>2024</option>
-            </select>
+            <select id="selectA" class="dropdown"></select>
+            <select id="selectB" class="dropdown"></select>
         </div>
         <div class="zoom-container">
             <button id="zoom-in" class="zoom-button">Zoom In</button>
@@ -140,13 +131,21 @@
         const zoomInBtn = document.getElementById('zoom-in');
         const zoomOutBtn = document.getElementById('zoom-out');
 
+        const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
         let startX = 0;
         let startY = 0;
         let active = false;
         let zoomLevel = 1;
-        let sliderPosition = 0.5; // Keep track of the slider's position as a fraction
+        let sliderPosition = 0.5;
         let panX = 0;
         let panY = 0;
+
+        function updateDropdowns(dataset) {
+            selectA.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
+            selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
+            imgA.src = `${dataset}_2002.jpg`;
+            imgB.src = `${dataset}_2024.jpg`;
+        }
 
         slider.addEventListener('mousedown', (e) => {
             active = true;
@@ -158,8 +157,8 @@
         function onDrag(e) {
             if (!active) return;
             let x = e.clientX - startX;
-            x = Math.max(0, Math.min(x, container.offsetWidth - slider.offsetWidth)); // Adjust for slider width
-            sliderPosition = x / (container.offsetWidth - slider.offsetWidth); // Calculate relative position
+            x = Math.max(0, Math.min(x, container.offsetWidth - slider.offsetWidth));
+            sliderPosition = x / (container.offsetWidth - slider.offsetWidth);
             slider.style.left = `${x}px`;
             updateClip();
         }
@@ -179,21 +178,7 @@
         });
 
         dataset.addEventListener('change', (e) => {
-            const dataset = e.target.value;
-            selectA.innerHTML = `
-                <option value="${dataset}_2002.jpg">2002</option>
-                <option value="${dataset}_2006.jpg">2006</option>
-                <option value="${dataset}_2020.jpg">2020</option>
-                <option value="${dataset}_2024.jpg">2024</option>
-            `;
-            selectB.innerHTML = `
-                <option value="${dataset}_2002.jpg">2002</option>
-                <option value="${dataset}_2006.jpg">2006</option>
-                <option value="${dataset}_2020.jpg">2020</option>
-                <option value="${dataset}_2024.jpg" selected>2024</option>
-            `;
-            imgA.src = `${dataset}_2002.jpg`;
-            imgB.src = `${dataset}_2024.jpg`;
+            updateDropdowns(e.target.value);
         });
 
         container.addEventListener('wheel', (e) => {
@@ -264,6 +249,7 @@
             imgA.style.clip = `rect(0, ${sliderPosition * (container.offsetWidth - slider.offsetWidth)}px, 100vh, 0)`;
         }
 
+        updateDropdowns('FP');
         updateClip();
     </script>
 </body>
