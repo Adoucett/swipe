@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Map Compare Tool</title>
+    <title>Image Compare Tool</title>
     <style>
         body, html {
             height: 100%;
@@ -30,7 +30,10 @@
             left: 0;
             height: 100%;
             width: 100%;
-            transition: left 0.4s ease-in-out;
+            transform-origin: top left;
+        }
+        .imgA {
+            clip: rect(0px, 50vw, 100vh, 0px);
         }
         .slider {
             position: absolute;
@@ -71,7 +74,7 @@
             <img id="imgB" src="FP_2024.jpg" class="img">
         </div>
         <div class="img-container">
-            <img id="imgA" src="FP_2002.jpg" class="img" style="clip: rect(0px, 50%, 100%, 0px);">
+            <img id="imgA" src="FP_2002.jpg" class="img imgA">
         </div>
         <div class="slider" id="slider" style="left: 50%;"></div>
         <div class="dropdown-container">
@@ -101,24 +104,26 @@
         let startX = 0;
         let active = false;
         let zoomLevel = 1;
-        
-        container.addEventListener('mousedown', (e) => {
-            active = true;
-            startX = e.pageX - slider.offsetLeft;
-            container.addEventListener('mousemove', onDrag);
-        });
 
-        container.addEventListener('mouseup', () => {
-            active = false;
-            container.removeEventListener('mousemove', onDrag);
+        slider.addEventListener('mousedown', (e) => {
+            active = true;
+            startX = e.clientX - slider.offsetLeft;
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', onStopDrag);
         });
 
         function onDrag(e) {
             if (!active) return;
-            let x = e.pageX - startX;
+            let x = e.clientX - startX;
             x = Math.max(0, Math.min(x, container.offsetWidth));
             slider.style.left = `${x}px`;
-            imgA.style.clip = `rect(0px, ${x}px, 100%, 0px)`;
+            imgA.style.clip = `rect(0px, ${x}px, 100vh, 0px)`;
+        }
+
+        function onStopDrag() {
+            active = false;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', onStopDrag);
         }
 
         selectA.addEventListener('change', (e) => {
@@ -131,7 +136,7 @@
 
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
-            zoomLevel += e.deltaY * -0.001;
+            zoomLevel += e.deltaY * -0.01;
             zoomLevel = Math.min(Math.max(1, zoomLevel), 5);
             imgA.style.transform = `scale(${zoomLevel})`;
             imgB.style.transform = `scale(${zoomLevel})`;
