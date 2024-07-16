@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Compare Tool_AB</title>
+    <title>Image Compare Tool</title>
     <style>
         body, html {
             height: 100%;
@@ -11,6 +11,7 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
             user-select: none; /* Prevent image selection */
+            background-color: #f0f0f0; /* Light background for better contrast */
         }
         .container {
             position: relative;
@@ -64,9 +65,15 @@
             left: 10px;
             z-index: 200;
             font-size: 1.2em;
+            color: #333; /* Darker font color for better readability */
         }
         .dropdown {
             margin: 0 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
         }
         .zoom-container {
             position: absolute;
@@ -74,6 +81,7 @@
             right: 10px;
             z-index: 200;
             font-size: 1.2em;
+            color: #333;
         }
         .zoom-button {
             margin: 0 5px;
@@ -82,6 +90,7 @@
             border: 1px solid #000;
             cursor: pointer;
             border-radius: 3px;
+            color: #333;
         }
     </style>
 </head>
@@ -132,9 +141,12 @@
         const zoomOutBtn = document.getElementById('zoom-out');
 
         let startX = 0;
+        let startY = 0;
         let active = false;
         let zoomLevel = 1;
         let sliderPosition = 0.5; // Keep track of the slider's position as a fraction
+        let panX = 0;
+        let panY = 0;
 
         slider.addEventListener('mousedown', (e) => {
             active = true;
@@ -186,33 +198,71 @@
 
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
-            zoomLevel += e.deltaY * -0.01;
-            zoomLevel = Math.min(Math.max(1, zoomLevel), 5);
-            imgA.style.transform = `scale(${zoomLevel})`;
-            imgB.style.transform = `scale(${zoomLevel})`;
-            updateClip();
+            zoom(e.clientX, e.clientY, e.deltaY * -0.01);
         });
 
         zoomInBtn.addEventListener('click', () => {
-            zoomLevel = Math.min(zoomLevel + 0.1, 5);
-            imgA.style.transform = `scale(${zoomLevel})`;
-            imgB.style.transform = `scale(${zoomLevel})`;
-            updateClip();
+            zoom(container.offsetWidth / 2, container.offsetHeight / 2, 0.1);
         });
 
         zoomOutBtn.addEventListener('click', () => {
-            zoomLevel = Math.max(zoomLevel - 0.1, 1);
-            imgA.style.transform = `scale(${zoomLevel})`;
-            imgB.style.transform = `scale(${zoomLevel})`;
-            updateClip();
+            zoom(container.offsetWidth / 2, container.offsetHeight / 2, -0.1);
         });
 
-        function updateClip() {
-            const clipWidth = container.offsetWidth * sliderPosition / zoomLevel;
-            imgA.style.clip = `rect(0px, ${clipWidth}px, 100vh, 0px)`;
+        function zoom(clientX, clientY, delta) {
+            const rect = container.getBoundingClientRect();
+            const offsetX = clientX - rect.left;
+            const offsetY = clientY - rect.top;
+
+            const prevZoomLevel = zoomLevel;
+            zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 5);
+
+            const scaleChange = zoomLevel / prevZoomLevel;
+
+            const newOffsetX = offsetX * scaleChange;
+            const newOffsetY = offsetY * scaleChange;
+
+            const dx = newOffsetX - offsetX;
+            const dy = newOffsetY - offsetY;
+
+            panX -= dx;
+            panY -= dy;
+
+            updateTransform();
+            updateClip();
         }
 
-        updateClip(); // Ensure initial clipping is correct
+        container.addEventListener('mousedown', (e) => {
+            active = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            document.addEventListener('mousemove', onPan);
+            document.addEventListener('mouseup', onStopPan);
+        });
+
+        function onPan(e) {
+            if (!active) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            updateTransform();
+        }
+
+        function onStopPan() {
+            active = false;
+            document.removeEventListener('mousemove', onPan);
+            document.removeEventListener('mouseup', onStopPan);
+        }
+
+        function updateTransform() {
+            imgA.style.transform = `scale(${zoomLevel}) translate(${panX / zoomLevel}px, ${panY / zoomLevel}px)`;
+            imgB.style.transform = `scale(${zoomLevel}) translate(${panX / zoomLevel}px, ${panY / zoomLevel}px)`;
+        }
+
+        function updateClip() {
+            imgA.style.clip = `rect(0, ${sliderPosition * 100}vw, 100vh, 0)`;
+        }
+
+        updateClip();
     </script>
 </body>
 </html>
