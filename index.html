@@ -3,85 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaflet Swipe Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <title>Image Compare Tool</title>
     <style>
-        body, html { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-        .leaflet-control-layers { display: none; }
-        .leaflet-bar { background-color: rgba(255, 255, 255, 0.8); border-radius: 4px; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1); }
-        .leaflet-bar a { color: #333; display: block; width: 26px; height: 26px; line-height: 26px; text-align: center; text-decoration: none; }
-        .leaflet-bar a:hover { background-color: #f4f4f4; }
-        .leaflet-bar a.disabled { pointer-events: none; color: #aaa; }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            position: relative;
+            height: 100%;
+        }
+        .img-container {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            position: absolute;
+        }
+        .img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: auto;
+            transition: left 0.4s ease-in-out;
+        }
+        .slider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #fff;
+            cursor: ew-resize;
+            z-index: 100;
+        }
+        .dropdown-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 200;
+        }
+        .dropdown {
+            margin: 0 5px;
+        }
+        .zoom-container {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 200;
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div class="container" id="image-compare-container">
+        <div class="img-container">
+            <img id="imgB" src="FP_2024.jpg" class="img">
+        </div>
+        <div class="img-container">
+            <img id="imgA" src="FP_2002.jpg" class="img" style="clip: rect(0px, 50%, 100%, 0px);">
+        </div>
+        <div class="slider" id="slider" style="left: 50%;"></div>
+        <div class="dropdown-container">
+            <select id="selectA" class="dropdown">
+                <option value="FP_2002.jpg">2002</option>
+                <option value="FP_2006.jpg">2006</option>
+                <option value="FP_2020.jpg">2020</option>
+                <option value="FP_2024.jpg">2024</option>
+            </select>
+            <select id="selectB" class="dropdown">
+                <option value="FP_2002.jpg">2002</option>
+                <option value="FP_2006.jpg">2006</option>
+                <option value="FP_2020.jpg">2020</option>
+                <option value="FP_2024.jpg">2024</option>
+            </select>
+        </div>
+        <div class="zoom-container">
+            <button id="zoom-in">Zoom In</button>
+            <button id="zoom-out">Zoom Out</button>
+        </div>
+    </div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="leaflet-compare.js"></script>
     <script>
-        // Initialize Leaflet map
-        var map = L.map('map').setView([38.6258125, -90.2564375], 13);
+        const container = document.getElementById('image-compare-container');
+        const slider = document.getElementById('slider');
+        const imgA = document.getElementById('imgA');
+        const imgB = document.getElementById('imgB');
+        const selectA = document.getElementById('selectA');
+        const selectB = document.getElementById('selectB');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
 
-        // Add base layer (e.g., OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Define the images
-        var imageOptions = [
-            { label: '2002', value: 'FP_2002.jpg' },
-            { label: '2006', value: 'FP_2006.jpg' },
-            { label: '2020', value: 'FP_2020.jpg' },
-            { label: '2024', value: 'FP_2024.jpg' }
-        ];
-
-        // Initialize left and right layers with default images
-        var leftLayer = L.imageOverlay('FP_2002.jpg', map.getBounds()).addTo(map);
-        var rightLayer = L.imageOverlay('FP_2024.jpg', map.getBounds()).addTo(map);
-
-        // Initialize compare control
-        var compareControl = L.control.compare(leftLayer, rightLayer, {
-            position: 'topright',
-            thumbSize: 50,
-            padding: 10,
-            position: 0.5 // Initial position of the divider (0 to 1)
-        }).addTo(map);
-
-        // Create dropdowns for image selection
-        var leftSelect = createDropdown('left-dropdown', imageOptions, 'Select Year', function(e) {
-            leftLayer.setUrl(e.target.value);
+        let startX = 0;
+        let active = false;
+        let zoomLevel = 1;
+        
+        container.addEventListener('mousedown', (e) => {
+            active = true;
+            startX = e.pageX - slider.offsetLeft;
+            container.addEventListener('mousemove', onDrag);
         });
 
-        var rightSelect = createDropdown('right-dropdown', imageOptions, 'Select Year', function(e) {
-            rightLayer.setUrl(e.target.value);
+        container.addEventListener('mouseup', () => {
+            active = false;
+            container.removeEventListener('mousemove', onDrag);
         });
 
-        // Add dropdowns to Leaflet control
-        L.control.layers(null, null, { position: 'topright' }).addTo(map);
-
-        // Function to create dropdown
-        function createDropdown(id, options, defaultText, onChange) {
-            var dropdown = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-            dropdown.innerHTML = '<select id="' + id + '" class="leaflet-control-layers leaflet-bar-part">' +
-                                    '<option value="">' + defaultText + '</option>' +
-                                '</select>';
-            dropdown.onmousedown = L.DomEvent.stopPropagation;
-            L.DomEvent.disableClickPropagation(dropdown);
-
-            var select = dropdown.querySelector('select');
-            options.forEach(function(option) {
-                var o = document.createElement('option');
-                o.value = option.value;
-                o.text = option.label;
-                select.appendChild(o);
-            });
-
-            select.addEventListener('change', onChange);
-
-            return dropdown;
+        function onDrag(e) {
+            if (!active) return;
+            let x = e.pageX - startX;
+            x = Math.max(0, Math.min(x, container.offsetWidth));
+            slider.style.left = `${x}px`;
+            imgA.style.clip = `rect(0px, ${x}px, 100%, 0px)`;
         }
+
+        selectA.addEventListener('change', (e) => {
+            imgA.src = e.target.value;
+        });
+
+        selectB.addEventListener('change', (e) => {
+            imgB.src = e.target.value;
+        });
+
+        function zoom(scale) {
+            zoomLevel = Math.max(1, zoomLevel + scale);
+            imgA.style.transform = `scale(${zoomLevel})`;
+            imgB.style.transform = `scale(${zoomLevel})`;
+        }
+
+        zoomInBtn.addEventListener('click', () => {
+            zoom(0.1);
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            zoom(-0.1);
+        });
     </script>
 </body>
 </html>
