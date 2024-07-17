@@ -17,6 +17,7 @@
             position: relative;
             height: 100%;
             width: 100%;
+            overflow: hidden; /* Ensure content doesn't overflow */
         }
         .img-container {
             height: 100%;
@@ -32,7 +33,9 @@
             left: 0;
             height: 100%;
             width: 100%;
+            object-fit: cover; /* Ensure images cover entire container */
             transform-origin: top left;
+            transition: transform 0.3s ease; /* Smooth transition on zoom */
         }
         .slider {
             position: absolute;
@@ -211,6 +214,7 @@
             panY -= dy;
 
             updateTransform();
+            updateClip();
         }
 
         container.addEventListener('mousedown', (e) => {
@@ -237,12 +241,12 @@
         }
 
         function updateTransform() {
-            imgA.style.transform = `scale(${zoomLevel}) translate(${panX / zoomLevel}px, ${panY / zoomLevel}px)`;
-            imgB.style.transform = `scale(${zoomLevel}) translate(${panX / zoomLevel}px, ${panY / zoomLevel}px)`;
+            imgA.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
+            imgB.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
         }
 
         function updateClip() {
-            imgA.style.clip = `rect(0, ${sliderPosition * 100}%, 100vh, 0)`;
+            imgA.style.clip = `rect(0, ${sliderPosition * 100}%, 100%, 0)`;
         }
 
         updateDropdowns('FP');
@@ -250,4 +254,3 @@
     </script>
 </body>
 </html>
-
