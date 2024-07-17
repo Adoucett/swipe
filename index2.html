@@ -35,9 +35,6 @@ body, html {
   align-items: center;
   justify-content: center;
 }
-.container {
-  height: 900px; /* adjust this value to your needs */
-}
 #map {
   height: 100%;
   width: 100%;
@@ -170,7 +167,7 @@ function loadImages(imageA, imageB) {
     overlayB = L.imageOverlay(imageB, bounds).addTo(map);
     overlayB.setOpacity(1);
 
-    map.setView([imgA.height / 2, imgA.width / 2], 0);
+    map.fitBounds(bounds);
     updateClip();
   });
 }
