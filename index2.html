@@ -108,8 +108,11 @@ function stopSlider() {
 
 function updateClip() {
   let x = sliderPosition * map.getSize().x;
-  overlayA.getElement().style.clip = `rect(0, ${x}px, ${map.getSize().y}px, 0)`;
-  overlayB.getElement().style.clip = `rect(0, ${map.getSize().x}px, ${map.getSize().y}px, ${x}px)`;
+  let size = map.getSize();
+  let clipA = `rect(0, ${x}px, ${size.y}px, 0)`;
+  let clipB = `rect(0, ${size.x}px, ${size.y}px, ${x}px)`;
+  overlayA.getElement().style.clip = clipA;
+  overlayB.getElement().style.clip = clipB;
 }
 
 function updateDropdowns(dataset) {
@@ -130,12 +133,12 @@ container.addEventListener('change', (e) => {
 
 zoomInBtn.addEventListener('click', () => {
   map.zoomIn();
-  updateClip();
+  setTimeout(updateClip, 200); // Ensure clip updates after zoom animation
 });
 
 zoomOutBtn.addEventListener('click', () => {
   map.zoomOut();
-  updateClip();
+  setTimeout(updateClip, 200); // Ensure clip updates after zoom animation
 });
 
 updateDropdowns('FP');
