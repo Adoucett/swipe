@@ -131,11 +131,11 @@ const zoomOutBtn = document.getElementById('zoom-out');
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
 let map = L.map('map', {
   center: [0, 0],
-  zoom: 0,
+  zoom: 2,
   crs: L.CRS.Simple,
-  minZoom: 0,
-  maxZoom: 5,
-  zoomControl: false
+  minZoom: -1,
+  maxZoom: 6,
+  zoomControl: true
 });
 
 let imgA, imgB;
