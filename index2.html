@@ -159,7 +159,7 @@
             let x = e.clientX - startX;
             x = Math.max(0, Math.min(x, container.offsetWidth - slider.offsetWidth));
             sliderPosition = x / container.offsetWidth;
-            slider.style.left = `${x}px`;
+            slider.style.left = `${sliderPosition * 100}%`;
             updateClip();
         }
 
@@ -246,7 +246,7 @@
         }
 
         function updateClip() {
-            imgA.style.clip = `rect(0, ${sliderPosition * container.offsetWidth}px, 100vh, 0)`;
+            imgA.style.clip = `rect(0, ${sliderPosition * 100}%, 100vh, 0)`;
         }
 
         updateDropdowns('FP');
