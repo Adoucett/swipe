@@ -142,15 +142,6 @@ let imgA, imgB;
 let overlayA, overlayB;
 let sliderPosition = 0.5;
 
-function preloadImages(imageA, imageB, callback) {
-  let loaded = 0;
-
-  function imageLoaded() {
-    loaded++;
-    if (loaded === 2) {
-      callback();
-    }
-  }
 
   imgA = new Image();
   imgA.onload = imageLoaded;
