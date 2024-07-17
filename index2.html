@@ -46,8 +46,8 @@ let map = L.map('map', {
   center: [0, 0],
   zoom: 0,
   crs: L.CRS.Simple,
-  minZoom: -5,
-  maxZoom: 10,
+  minZoom: -4,
+  maxZoom: 5,
   zoomControl: false,
   dragging: false // Disable default dragging
 });
@@ -83,6 +83,7 @@ function loadImages(imageA, imageB) {
 
     map.setMaxBounds(bounds);
     map.fitBounds(bounds);
+    map.setView([imgA.height / 2, imgA.width / 2], map.getZoom(), {animate: false}); // Center the map
     updateClip();
   });
 }
