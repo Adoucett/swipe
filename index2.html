@@ -13,7 +13,7 @@
   --primary-color: #333;
   --border-color: #ccc;
   --slider-width: 5px;
-  --slider-handle-size: 24px;
+  --slider-handle-size: 25px;
   --slider-handle-color: #fff;
   --slider-handle-border: 2px solid #000;
   --zoom-button-bg: #fff;
@@ -48,7 +48,7 @@ body, html {
   background-color: var(--slider-handle-color);
   cursor: ew-resize;
   z-index: 1000;
-  transition: left 0.1s ease;
+  transition: left 0.3s ease;
 }
 .slider::before {
   content: '';
@@ -68,15 +68,23 @@ body, html {
   top: 10px;
   left: 10px;
   z-index: 2000;
-  font-size: 1.4em;
+  font-size: 1.6em;
   color: var(--primary-color);
 }
 .dropdown {
   margin: 0 5px;
-  padding: 5px;
+  padding: 6px;
   border: 1px solid var(--border-color);
   border-radius: 5px;
   background-color: var(--zoom-button-bg);
+  color: var(--primary-color);
+}
+.dropdown-container-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2000;
+  font-size: 1.6em;
   color: var(--primary-color);
 }
 .zoom-container {
@@ -84,7 +92,7 @@ body, html {
   bottom: 10px;
   right: 10px;
   z-index: 2000;
-  font-size: 1.2em;
+  font-size: 1.6em;
   color: var(--primary-color);
 }
 .zoom-button {
@@ -111,6 +119,9 @@ body, html {
       <option value="BR">Bridgeton</option>
     </select>
     <select id="selectA" class="dropdown" aria-label="Image A selector"></select>
+  </div>
+  <div class="dropdown-container-right">
+    <label for="selectB">Image B:</label>
     <select id="selectB" class="dropdown" aria-label="Image B selector"></select>
   </div>
   <div class="zoom-container">
