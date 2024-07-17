@@ -9,42 +9,33 @@
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
-            overflow: hidden;
-            user-select: none;
             background-color: #f0f0f0;
         }
         .container {
             position: relative;
             height: 100%;
-            width: 100%;
-            overflow: hidden; /* Ensure content doesn't overflow */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .img-container {
-            height: 100%;
+            position: relative;
             width: 100%;
+            max-width: 100%;
             overflow: hidden;
-            position: absolute;
-            top: 0;
-            left: 0;
+            margin-bottom: 10px;
         }
         .img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
             width: 100%;
-            object-fit: cover; /* Ensure images cover entire container */
-            transform-origin: top left;
-            transition: transform 0.3s ease; /* Smooth transition on zoom */
+            display: block;
         }
         .slider {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 4px;
+            position: relative;
+            width: 100%;
+            height: 4px;
             background-color: #fff;
-            cursor: ew-resize;
-            z-index: 100;
+            margin: 10px 0;
         }
         .slider:before {
             content: '';
@@ -57,15 +48,12 @@
             background-color: #fff;
             border: 2px solid #000;
             border-radius: 50%;
-            z-index: 101;
         }
         .dropdown-container {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 200;
-            font-size: 1.2em;
-            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
         }
         .dropdown {
             margin: 0 5px;
@@ -74,23 +62,22 @@
             border-radius: 5px;
             background-color: #fff;
             color: #333;
+            font-size: 1.5em; /* Increased font size */
         }
         .zoom-container {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            z-index: 200;
-            font-size: 1.2em;
-            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .zoom-button {
             margin: 0 5px;
-            padding: 5px 10px;
+            padding: 8px 15px; /* Increased padding */
             background-color: #fff;
             border: 1px solid #000;
             cursor: pointer;
             border-radius: 3px;
             color: #333;
+            font-size: 1.5em; /* Increased font size */
         }
     </style>
 </head>
@@ -98,13 +85,10 @@
     <div class="container" id="image-compare-container">
         <div class="img-container">
             <img id="imgB" src="FP_2024.jpg" class="img">
-        </div>
-        <div class="img-container">
             <img id="imgA" src="FP_2002.jpg" class="img imgA">
         </div>
         <div class="slider" id="slider" style="left: 50%;"></div>
         <div class="dropdown-container">
-            <label for="dataset">Dataset:</label>
             <select id="dataset" class="dropdown">
                 <option value="FP">Forest Park South East</option>
                 <option value="BH">Botanical Heights</option>
@@ -122,23 +106,14 @@
 
     <script>
         const container = document.getElementById('image-compare-container');
-        const slider = document.getElementById('slider');
         const imgA = document.getElementById('imgA');
         const imgB = document.getElementById('imgB');
         const selectA = document.getElementById('selectA');
         const selectB = document.getElementById('selectB');
         const dataset = document.getElementById('dataset');
-        const zoomInBtn = document.getElementById('zoom-in');
-        const zoomOutBtn = document.getElementById('zoom-out');
-
+        const slider = document.getElementById('slider');
         const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
-        let startX = 0;
-        let startY = 0;
-        let active = false;
-        let zoomLevel = 1;
         let sliderPosition = 0.5;
-        let panX = 0;
-        let panY = 0;
 
         function updateDropdowns(datasetValue) {
             selectA.innerHTML = years.map(year => `<option value="${datasetValue}_${year}.jpg">${year}</option>`).join('');
@@ -147,27 +122,27 @@
             imgB.src = `${datasetValue}_2024.jpg`;
         }
 
+        function updateClip() {
+            imgA.style.clip = `rect(0, ${sliderPosition * 100}%, 100%, 0)`;
+        }
+
         slider.addEventListener('mousedown', (e) => {
-            active = true;
-            startX = e.clientX - slider.offsetLeft;
-            document.addEventListener('mousemove', onDrag);
-            document.addEventListener('mouseup', onStopDrag);
+            const startX = e.clientX - slider.offsetLeft;
+            const containerWidth = container.offsetWidth;
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', () => {
+                document.removeEventListener('mousemove', onMouseMove);
+            });
+
+            function onMouseMove(e) {
+                let x = e.clientX - startX;
+                x = Math.max(0, Math.min(x, containerWidth - slider.offsetWidth));
+                sliderPosition = x / containerWidth;
+                slider.style.left = `${sliderPosition * 100}%`;
+                updateClip();
+            }
         });
-
-        function onDrag(e) {
-            if (!active) return;
-            let x = e.clientX - startX;
-            x = Math.max(0, Math.min(x, container.offsetWidth - slider.offsetWidth));
-            sliderPosition = x / container.offsetWidth;
-            slider.style.left = `${sliderPosition * 100}%`;
-            updateClip();
-        }
-
-        function onStopDrag() {
-            active = false;
-            document.removeEventListener('mousemove', onDrag);
-            document.removeEventListener('mouseup', onStopDrag);
-        }
 
         selectA.addEventListener('change', (e) => {
             imgA.src = e.target.value;
@@ -180,74 +155,6 @@
         dataset.addEventListener('change', (e) => {
             updateDropdowns(e.target.value);
         });
-
-        container.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            zoom(e.clientX, e.clientY, e.deltaY * -0.01);
-        });
-
-        zoomInBtn.addEventListener('click', () => {
-            zoom(container.offsetWidth / 2, container.offsetHeight / 2, 0.1);
-        });
-
-        zoomOutBtn.addEventListener('click', () => {
-            zoom(container.offsetWidth / 2, container.offsetHeight / 2, -0.1);
-        });
-
-        function zoom(clientX, clientY, delta) {
-            const rect = container.getBoundingClientRect();
-            const offsetX = clientX - rect.left;
-            const offsetY = clientY - rect.top;
-
-            const prevZoomLevel = zoomLevel;
-            zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 5);
-
-            const scaleChange = zoomLevel / prevZoomLevel;
-
-            const newOffsetX = offsetX * scaleChange;
-            const newOffsetY = offsetY * scaleChange;
-
-            const dx = newOffsetX - offsetX;
-            const dy = newOffsetY - offsetY;
-
-            panX -= dx;
-            panY -= dy;
-
-            updateTransform();
-            updateClip();
-        }
-
-        container.addEventListener('mousedown', (e) => {
-            if (e.target !== slider) {
-                active = true;
-                startX = e.clientX - panX;
-                startY = e.clientY - panY;
-                document.addEventListener('mousemove', onPan);
-                document.addEventListener('mouseup', onStopPan);
-            }
-        });
-
-        function onPan(e) {
-            if (!active) return;
-            panX = e.clientX - startX;
-            panY = e.clientY - startY;
-            updateTransform();
-        }
-
-        function onStopPan() {
-            active = false;
-            document.removeEventListener('mousemove', onPan);
-            document.removeEventListener('mouseup', onStopPan);
-        }
-
-        function updateTransform() {
-            imgA.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
-            imgB.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
-        }
-
-        function updateClip() {
-            imgA.style.clip = `rect(0, ${sliderPosition * 100}%, 100%, 0)`;
-        }
 
         updateDropdowns('FP');
         updateClip();
