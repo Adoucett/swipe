@@ -131,11 +131,12 @@ const zoomOutBtn = document.getElementById('zoom-out');
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
 let map = L.map('map', {
   center: [0, 0],
-  zoom: 2,
+  zoom: 0,
   crs: L.CRS.Simple,
   minZoom: -1,
   maxZoom: 6,
-  zoomControl: true
+  zoomControl: false,
+  dragging: false // Disable default dragging
 });
 
 let imgA, imgB;
@@ -167,6 +168,7 @@ function loadImages(imageA, imageB) {
     overlayB = L.imageOverlay(imageB, bounds).addTo(map);
     overlayB.setOpacity(1);
 
+    map.setMaxBounds(bounds);
     map.fitBounds(bounds);
     updateClip();
   });
@@ -214,10 +216,12 @@ container.addEventListener('change', (e) => {
 
 zoomInBtn.addEventListener('click', () => {
   map.zoomIn();
+  updateClip();
 });
 
 zoomOutBtn.addEventListener('click', () => {
   map.zoomOut();
+  updateClip();
 });
 
 updateDropdowns('FP');
