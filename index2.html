@@ -1,147 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Compare Tool</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compare Tool</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Additional CSS for styling */
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .slider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: rgba(255, 255, 255, 0.7);
+      z-index: 1000;
+      cursor: ew-resize;
+    }
+    .dropdown-container,
+    .dropdown-container-right,
+    .zoom-container {
+      position: absolute;
+      top: 10px;
+      z-index: 1001;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 5px;
+    }
+    .dropdown-container {
+      left: 10px;
+    }
+    .dropdown-container-right {
+      right: 10px;
+    }
+    .zoom-container {
+      right: 10px;
+      top: auto;
+      bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-<div class="container" id="image-compare-container" role="main">
-  <div id="map"></div>
-  <div class="slider" id="slider" style="left: 50%;"></div>
-  <div class="dropdown-container">
-    <label for="dataset">Dataset:</label>
-    <select id="dataset" class="dropdown" aria-label="Dataset selector">
-      <option value="FP">Forest Park Southeast</option>
-      <option value="BH">Botanical Heights</option>
-      <option value="North">North City</option>
-      <option value="BR">Bridgeton</option>
-    </select>
-    <select id="selectA" class="dropdown" aria-label="Image A selector"></select>
+  <div class="container" id="image-compare-container" role="main">
+    <div id="map"></div>
+    <div class="slider" id="slider" style="left: 50%;"></div>
+    <div class="dropdown-container">
+      <label for="dataset">Dataset:</label>
+      <select id="dataset" class="dropdown" aria-label="Dataset selector">
+        <option value="FP">Forest Park Southeast</option>
+        <option value="BH">Botanical Heights</option>
+        <option value="North">North City</option>
+        <option value="BR">Bridgeton</option>
+      </select>
+      <select id="selectA" class="dropdown" aria-label="Image A selector"></select>
+    </div>
+    <div class="dropdown-container-right">
+      <label for="selectB">Image B:</label>
+      <select id="selectB" class="dropdown" aria-label="Image B selector"></select>
+    </div>
+    <div class="zoom-container">
+      <button id="zoom-in" class="zoom-button" aria-label="Zoom In">Zoom In</button>
+      <button id="zoom-out" class="zoom-button" aria-label="Zoom Out">Zoom Out</button>
+    </div>
   </div>
-  <div class="dropdown-container-right">
-    <label for="selectB">Image B:</label>
-    <select id="selectB" class="dropdown" aria-label="Image B selector"></select>
-  </div>
-  <div class="zoom-container">
-    <button id="zoom-in" class="zoom-button" aria-label="Zoom In">Zoom In</button>
-    <button id="zoom-out" class="zoom-button" aria-label="Zoom Out">Zoom Out</button>
-  </div>
-</div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-const container = document.getElementById('image-compare-container');
-const slider = document.getElementById('slider');
-const selectA = document.getElementById('selectA');
-const selectB = document.getElementById('selectB');
-const dataset = document.getElementById('dataset');
-const zoomInBtn = document.getElementById('zoom-in');
-const zoomOutBtn = document.getElementById('zoom-out');
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const container = document.getElementById('image-compare-container');
+    const slider = document.getElementById('slider');
+    const selectA = document.getElementById('selectA');
+    const selectB = document.getElementById('selectB');
+    const dataset = document.getElementById('dataset');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
 
-const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
-let map = L.map('map', {
-  center: [0, 0],
-  zoom: 0,
-  crs: L.CRS.Simple,
-  minZoom: -4,
-  maxZoom: 5,
-  zoomControl: false,
-  dragging: false // Disable default dragging
-});
+    const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
+    let map = L.map('map', {
+      center: [0, 0],
+      zoom: 0,
+      crs: L.CRS.Simple,
+      zoomControl: false,
+      dragging: false
+    });
 
-let imgA, imgB;
-let overlayA, overlayB;
-let sliderPosition = 0.5;
+    let imgA, imgB;
+    let overlayA, overlayB;
+    let sliderPosition = 0.5;
 
-function preloadImages(imageA, imageB, callback) {
-  let loaded = 0;
-  imgA = new Image();
-  imgB = new Image();
-  imgA.onload = imgB.onload = function() {
-    loaded++;
-    if (loaded === 2) callback();
-  };
-  imgA.src = imageA;
-  imgB.src = imageB;
-}
+    function preloadImages(imageA, imageB, callback) {
+      let loaded = 0;
+      imgA = new Image();
+      imgB = new Image();
+      imgA.onload = imgB.onload = function() {
+        loaded++;
+        if (loaded === 2) callback();
+      };
+      imgA.src = imageA;
+      imgB.src = imageB;
+    }
 
-function loadImages(imageA, imageB) {
-  preloadImages(imageA, imageB, () => {
-    if (overlayA) map.removeLayer(overlayA);
-    if (overlayB) map.removeLayer(overlayB);
+    function loadImages(imageA, imageB) {
+      preloadImages(imageA, imageB, () => {
+        if (overlayA) map.removeLayer(overlayA);
+        if (overlayB) map.removeLayer(overlayB);
 
-    let bounds = [[0, 0], [imgA.height, imgA.width]];
+        let bounds = [[0, 0], [imgA.height, imgA.width]];
 
-    overlayA = L.imageOverlay(imageA, bounds).addTo(map);
-    overlayA.setOpacity(1);
+        overlayA = L.imageOverlay(imageA, bounds).addTo(map);
+        overlayA.setOpacity(1);
 
-    overlayB = L.imageOverlay(imageB, bounds).addTo(map);
-    overlayB.setOpacity(1);
+        overlayB = L.imageOverlay(imageB, bounds).addTo(map);
+        overlayB.setOpacity(1);
 
-    map.setMaxBounds(bounds);
-    map.fitBounds(bounds);
-    map.setView([imgA.height / 2, imgA.width / 2], map.getZoom(), {animate: false}); // Center the map
-    updateClip();
-  });
-}
+        map.setMaxBounds(bounds);
+        map.fitBounds(bounds);
+        updateClip();
+      });
+    }
 
-slider.addEventListener('mousedown', (e) => {
-  document.addEventListener('mousemove', moveSlider);
-  document.addEventListener('mouseup', stopSlider);
-});
+    slider.addEventListener('mousedown', (e) => {
+      document.addEventListener('mousemove', moveSlider);
+      document.addEventListener('mouseup', stopSlider);
+    });
 
-function moveSlider(e) {
-  let x = e.clientX - container.offsetLeft;
-  x = Math.max(0, Math.min(x, container.offsetWidth));
-  sliderPosition = x / container.offsetWidth;
-  slider.style.left = `${sliderPosition * 100}%`;
-  updateClip();
-}
+    function moveSlider(e) {
+      let x = e.clientX - container.offsetLeft;
+      x = Math.max(0, Math.min(x, container.offsetWidth));
+      sliderPosition = x / container.offsetWidth;
+      slider.style.left = `${sliderPosition * 100}%`;
+      updateClip();
+    }
 
-function stopSlider() {
-  document.removeEventListener('mousemove', moveSlider);
-  document.removeEventListener('mouseup', stopSlider);
-}
+    function stopSlider() {
+      document.removeEventListener('mousemove', moveSlider);
+      document.removeEventListener('mouseup', stopSlider);
+    }
 
-function updateClip() {
-  let x = sliderPosition * map.getSize().x;
-  let size = map.getSize();
-  let clipA = `rect(0, ${x}px, ${size.y}px, 0)`;
-  let clipB = `rect(0, ${size.x}px, ${size.y}px, ${x}px)`;
-  overlayA.getElement().style.clip = clipA;
-  overlayB.getElement().style.clip = clipB;
-}
+    function updateClip() {
+      let x = sliderPosition * map.getSize().x;
+      overlayA.getElement().style.clip = `rect(0, ${x}px, ${map.getSize().y}px, 0)`;
+      overlayB.getElement().style.clip = `rect(0, ${map.getSize().x}px, ${map.getSize().y}px, ${x}px)`;
+    }
 
-function updateDropdowns(dataset) {
-  selectA.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
-  selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
-  loadImages(`${dataset}_2002.jpg`, `${dataset}_2024.jpg`);
-}
+    function updateDropdowns(dataset) {
+      selectA.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
+      selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
+      loadImages(`${dataset}_2002.jpg`, `${dataset}_2024.jpg`);
+    }
 
-container.addEventListener('change', (e) => {
-  if (e.target === selectA) {
-    loadImages(e.target.value, selectB.value);
-  } else if (e.target === selectB) {
-    loadImages(selectA.value, e.target.value);
-  } else if (e.target === dataset) {
-    updateDropdowns(e.target.value);
-  }
-});
+    container.addEventListener('change', (e) => {
+      if (e.target === selectA) {
+        loadImages(e.target.value, selectB.value);
+      } else if (e.target === selectB) {
+        loadImages(selectA.value, e.target.value);
+      } else if (e.target === dataset) {
+        updateDropdowns(e.target.value);
+      }
+    });
 
-zoomInBtn.addEventListener('click', () => {
-  map.zoomIn();
-  setTimeout(updateClip, 200); // Ensure clip updates after zoom animation
-});
+    zoomInBtn.addEventListener('click', () => {
+      map.zoomIn();
+      setTimeout(updateClip, 500); // Ensure clip is updated after zoom animation
+    });
 
-zoomOutBtn.addEventListener('click', () => {
-  map.zoomOut();
-  setTimeout(updateClip, 200); // Ensure clip updates after zoom animation
-});
+    zoomOutBtn.addEventListener('click', () => {
+      map.zoomOut();
+      setTimeout(updateClip, 500); // Ensure clip is updated after zoom animation
+    });
 
-updateDropdowns('FP');
-</script>
+    updateDropdowns('FP');
+  </script>
 </body>
 </html>
