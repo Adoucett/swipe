@@ -34,9 +34,6 @@
             width: 100%;
             transform-origin: top left;
         }
-        .imgA {
-            clip: rect(0px, 50vw, 100vh, 0px);
-        }
         .slider {
             position: absolute;
             top: 0;
@@ -140,11 +137,11 @@
         let panX = 0;
         let panY = 0;
 
-        function updateDropdowns(dataset) {
-            selectA.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
-            selectB.innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
-            imgA.src = `${dataset}_2002.jpg`;
-            imgB.src = `${dataset}_2024.jpg`;
+        function updateDropdowns(datasetValue) {
+            selectA.innerHTML = years.map(year => `<option value="${datasetValue}_${year}.jpg">${year}</option>`).join('');
+            selectB.innerHTML = years.map(year => `<option value="${datasetValue}_${year}.jpg">${year}</option>`).join('');
+            imgA.src = `${datasetValue}_2002.jpg`;
+            imgB.src = `${datasetValue}_2024.jpg`;
         }
 
         slider.addEventListener('mousedown', (e) => {
@@ -214,7 +211,6 @@
             panY -= dy;
 
             updateTransform();
-            updateClip();
         }
 
         container.addEventListener('mousedown', (e) => {
