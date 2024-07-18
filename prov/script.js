@@ -126,5 +126,5 @@ function updateClip() {
     imgA.style.clip = `rect(0, ${sliderPosition * (container.offsetWidth - slider.offsetWidth)}px, 100vh, 0)`;
 }
 
-updateDropdowns('FP');
+updateDropdowns('Prov');
 updateClip();
