@@ -1,3 +1,4 @@
+/* Providence RI Viewer */
 const container = document.getElementById('image-compare-container');
 const slider = document.getElementById('slider');
 const imgA = document.getElementById('imgA');
