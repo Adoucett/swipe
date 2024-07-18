@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compare Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="image-compare-container">
+        <div class="img-container">
+            <img id="imgB" src="Prov_2024.jpg" class="img imgB">
+        </div>
+        <div class="img-container img-wrapper" id="img-wrapper">
+            <img id="imgA" src="Prov_2002.jpg" class="img imgA">
+        </div>
+        <div class="slider" id="slider" style="left: 50%;"></div>
+        <div class="dropdown-container">
+            <label for="dataset">Dataset:</label>
+            <select id="dataset" class="dropdown">
+                <option value="Prov">Providence, RI</option>
+            </select>
+            <select id="selectA" class="dropdown"></select>
+        </div>
+        <select id="selectB" class="dropdown"></select>
+        <div class="zoom-container">
+            <button id="zoom-in" class="zoom-button">Zoom In</button>
+            <button id="zoom-out" class="zoom-button">Zoom Out</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
