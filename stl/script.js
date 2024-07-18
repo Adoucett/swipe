@@ -33,11 +33,13 @@ slider.addEventListener('mousedown', (e) => {
 
 function onDrag(e) {
     if (!active) return;
-    let x = e.clientX - startX;
-    x = Math.max(0, Math.min(x, container.offsetWidth - slider.offsetWidth));
-    sliderPosition = x / (container.offsetWidth - slider.offsetWidth);
-    slider.style.left = `${x}px`;
-    updateClip();
+    requestAnimationFrame(() => {
+        let x = e.clientX - startX;
+        x = Math.max(0, Math.min(x, container.offsetWidth - slider.offsetWidth));
+        sliderPosition = x / (container.offsetWidth - slider.offsetWidth);
+        slider.style.left = `${x}px`;
+        updateClip();
+    });
 }
 
 function onStopDrag() {
@@ -60,8 +62,8 @@ dataset.addEventListener('change', (e) => {
 
 container.addEventListener('wheel', (e) => {
     e.preventDefault();
-    zoom(e.clientX, e.clientY, e.deltaY * -0.01);
-});
+    debounce(() => zoom(e.clientX, e.clientY, e.deltaY * -0.01), 100);
+}, { passive: true });
 
 zoomInBtn.addEventListener('click', () => {
     zoom(container.offsetWidth / 2, container.offsetHeight / 2, 0.1);
@@ -72,26 +74,19 @@ zoomOutBtn.addEventListener('click', () => {
 });
 
 function zoom(clientX, clientY, delta) {
-    const rect = container.getBoundingClientRect();
-    const offsetX = clientX - rect.left;
-    const offsetY = clientY - rect.top;
+    requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const offsetX = (clientX - rect.left - panX) / zoomLevel;
+        const offsetY = (clientY - rect.top - panY) / zoomLevel;
 
-    const prevZoomLevel = zoomLevel;
-    zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 5);
+        zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 5);
 
-    const scaleChange = zoomLevel / prevZoomLevel;
+        panX = clientX - rect.left - offsetX * zoomLevel;
+        panY = clientY - rect.top - offsetY * zoomLevel;
 
-    const newOffsetX = offsetX * scaleChange;
-    const newOffsetY = offsetY * scaleChange;
-
-    const dx = newOffsetX - offsetX;
-    const dy = newOffsetY - offsetY;
-
-    panX -= dx;
-    panY -= dy;
-
-    updateTransform();
-    updateClip();
+        updateTransform();
+        updateClip();
+    });
 }
 
 container.addEventListener('mousedown', (e) => {
@@ -106,9 +101,11 @@ container.addEventListener('mousedown', (e) => {
 
 function onPan(e) {
     if (!active) return;
-    panX = e.clientX - startX;
-    panY = e.clientY - startY;
-    updateTransform();
+    requestAnimationFrame(() => {
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        updateTransform();
+    });
 }
 
 function onStopPan() {
@@ -123,7 +120,16 @@ function updateTransform() {
 }
 
 function updateClip() {
-    imgA.style.clip = `rect(0, ${sliderPosition * (container.offsetWidth - slider.offsetWidth)}px, 100vh, 0)`;
+    const clipWidth = sliderPosition * container.offsetWidth / zoomLevel;
+    imgA.style.clip = `rect(0, ${clipWidth}px, 100vh, 0)`;
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
 }
 
 updateDropdowns('FP');
