@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Swipe between maps</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+    body {
+        overflow: hidden;
+    }
+
+    body * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
+<div id="comparison-container">
+    <div id="before" class="map"></div>
+    <div id="after" class="map"></div>
+</div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWRvdWNldHQiLCJhIjoiY2lvZDFsc2lwMDRnd3Zha2pneWpxcHh6biJ9.sbWgw2zPGyScsp-r4CYQnA';
+
+    const coordinates = [
+        [-90.27096005, 38.63411217], // Top-left coordinates [longitude, latitude]
+        [-90.2431005, 38.6303475],   // Top-right coordinates [longitude, latitude]
+        [-90.2470013, 38.6192146],   // Bottom-right coordinates [longitude, latitude]
+        [-90.27227390, 38.62250509]  // Bottom-left coordinates [longitude, latitude]
+    ];
+
+    const beforeMap = new mapboxgl.Map({
+        container: 'before',
+        style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+        center: [-90.258442, 38.626422],
+        zoom: 12
+    });
+
+    const afterMap = new mapboxgl.Map({
+        container: 'after',
+        style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+        center: [-90.258442, 38.626422],
+        zoom: 12
+    });
+
+    beforeMap.on('load', function() {
+        beforeMap.addSource('overlay', {
+            type: 'image',
+            url: 'https://adoucett.github.io/swipe/stl/FP_2002.jpg',
+            coordinates: coordinates
+        });
+
+        beforeMap.addLayer({
+            id: 'overlay',
+            source: 'overlay',
+            type: 'raster',
+            paint: {
+                'raster-opacity': 1
+            }
+        });
+    });
+
+    afterMap.on('load', function() {
+        afterMap.addSource('overlay', {
+            type: 'image',
+            url: 'https://adoucett.github.io/swipe/stl/FP_2024.jpg',
+            coordinates: coordinates
+        });
+
+        afterMap.addLayer({
+            id: 'overlay',
+            source: 'overlay',
+            type: 'raster',
+            paint: {
+                'raster-opacity': 1
+            }
+        });
+    });
+
+    const container = '#comparison-container';
+
+    const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
+        // Set this to enable comparing two maps by mouse movement:
+        // mousemove: true
+    });
+</script>
+</body>
+</html>
