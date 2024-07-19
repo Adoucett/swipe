@@ -35,7 +35,7 @@ const setSliderPosition = (x) => {
 const onDrag = (e) => {
     if (!active) return;
     requestAnimationFrame(() => {
-        const x = e.clientX - startX;
+        const x = (e.clientX || e.touches[0].clientX) - startX;
         setSliderPosition(x);
     });
 };
@@ -44,6 +44,8 @@ const onStopDrag = () => {
     active = false;
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', onStopDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', onStopDrag);
 };
 
 const zoom = (clientX, clientY, delta) => {
@@ -65,8 +67,8 @@ const zoom = (clientX, clientY, delta) => {
 const onPan = (e) => {
     if (!active) return;
     requestAnimationFrame(() => {
-        panX = e.clientX - startX;
-        panY = e.clientY - startY;
+        panX = (e.clientX || e.touches[0].clientX) - startX;
+        panY = (e.clientY || e.touches[0].clientY) - startY;
         updateTransform();
     });
 };
@@ -75,6 +77,8 @@ const onStopPan = () => {
     active = false;
     document.removeEventListener('mousemove', onPan);
     document.removeEventListener('mouseup', onStopPan);
+    document.removeEventListener('touchmove', onPan);
+    document.removeEventListener('touchend', onStopPan);
 };
 
 const updateTransform = () => {
@@ -115,6 +119,13 @@ slider.addEventListener('mousedown', (e) => {
     document.addEventListener('mouseup', onStopDrag);
 });
 
+slider.addEventListener('touchstart', (e) => {
+    active = true;
+    startX = e.touches[0].clientX - slider.offsetLeft;
+    document.addEventListener('touchmove', onDrag);
+    document.addEventListener('touchend', onStopDrag);
+});
+
 selectA.addEventListener('change', (e) => {
     imgA.src = e.target.value;
 });
@@ -132,6 +143,12 @@ container.addEventListener('wheel', debounce((e) => {
     zoom(e.clientX, e.clientY, e.deltaY * -0.01);
 }, 100), { passive: true });
 
+container.addEventListener('touchmove', debounce((e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    zoom(touch.clientX, touch.clientY, touch.radiusX * -0.01);
+}, 100), { passive: true });
+
 zoomInBtn.addEventListener('click', () => {
     zoom(container.offsetWidth / 2, container.offsetHeight / 2, 0.1);
 });
@@ -146,9 +163,18 @@ container.addEventListener('mousedown', (e) => {
     if (e.target !== slider) {
         active = true;
         startX = e.clientX - panX;
-        startY = e.clientY - panY;
         document.addEventListener('mousemove', onPan);
         document.addEventListener('mouseup', onStopPan);
+    }
+});
+
+container.addEventListener('touchstart', (e) => {
+    if (e.target !== slider) {
+        active = true;
+        startX = e.touches[0].clientX - panX;
+        startY = e.touches[0].clientY - panY;
+        document.addEventListener('touchmove', onPan);
+        document.addEventListener('touchend', onStopPan);
     }
 });
 
