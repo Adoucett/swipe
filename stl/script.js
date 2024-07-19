@@ -85,8 +85,9 @@ const updateTransform = () => {
 };
 
 const updateClip = () => {
-    const clipWidth = sliderPosition * container.offsetWidth / zoomLevel;
-    imgA.style.clip = `rect(0, ${clipWidth}px, 100vh, 0)`;
+    const rect = container.getBoundingClientRect();
+    const clipWidth = sliderPosition * rect.width / zoomLevel;
+    imgA.style.clip = `rect(0, ${clipWidth}px, ${rect.height}px, 0)`;
 };
 
 const resetView = () => {
