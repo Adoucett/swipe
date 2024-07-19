@@ -11,7 +11,6 @@ const resetViewBtn = document.getElementById('reset-view');
 
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
 let startX = 0;
-let startY = 0;
 let active = false;
 let zoomLevel = 1;
 let sliderPosition = 0.5;
@@ -86,7 +85,7 @@ const updateTransform = () => {
 
 const updateClip = () => {
     const rect = container.getBoundingClientRect();
-    const clipWidth = sliderPosition * rect.width / zoomLevel;
+    const clipWidth = sliderPosition * rect.width;
     imgA.style.clip = `rect(0, ${clipWidth}px, ${rect.height}px, 0)`;
 };
 
