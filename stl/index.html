@@ -1,40 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Compare Tool</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="utf-8">
+    <title>Swipe between maps</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; }
+        #comparison-container { position: relative; height: 100vh; }
+        .map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .dropdown-container { position: absolute; top: 10px; left: 10px; z-index: 1; background: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <div class="container" id="image-compare-container">
-        <div class="img-container">
-            <img id="imgB" src="FP_2024.jpg" class="img imgB">
-        </div>
-        <div class="img-container img-wrapper" id="img-wrapper">
-            <img id="imgA" src="FP_2002.jpg" class="img imgA">
-        </div>
-        <div class="slider" id="slider" style="left: 50%;"></div>
-        <div class="dropdown-container">
-            <label for="dataset">Dataset:</label>
-            <select id="dataset" class="dropdown">
-                <option value="FP">Forest Park Southeast</option>
-                <option value="CWE">Central West End</option>
-                <option value="BH">Botanical Heights</option>
-                <option value="North">North City</option>
-                <option value="BR">Bridgeton/Airport</option>
-                <option value="DT">Downtown</option>
-            </select>
-            <select id="selectA" class="dropdown"></select>
-        </div>
+    <div class="dropdown-container">
+        <label for="dataset">Dataset:</label>
+        <select id="dataset" class="dropdown">
+            <option value="FP">Forest Park Southeast</option>
+            <option value="CWE">Central West End</option>
+            <option value="BH">Botanical Heights</option>
+            <option value="North">North City</option>
+            <option value="BR">Bridgeton/Airport</option>
+            <option value="DT">Downtown</option>
+        </select>
+        <label for="selectA">Year Left:</label>
+        <select id="selectA" class="dropdown"></select>
+        <label for="selectB">Year Right:</label>
         <select id="selectB" class="dropdown"></select>
-        <div class="zoom-container">
-            <button id="zoom-in" class="zoom-button">Zoom In</button>
-            <button id="zoom-out" class="zoom-button">Zoom Out</button>
-            <button id="reset-view" class="zoom-button">Reset View</button>
-
-        </div>
     </div>
-    <script src="script.js"></script>
+    <div id="comparison-container">
+        <div id="before" class="map"></div>
+        <div id="after" class="map"></div>
+    </div>
+    <script>
+       mapboxgl.accessToken = 'pk.eyJ1IjoiYWRvdWNldHQiLCJhIjoiY2lvZDFsc2lwMDRnd3Zha2pneWpxcHh6biJ9.sbWgw2zPGyScsp-r4CYQnA';
+
+const datasets = {
+    'FP': {
+        coordinates: [
+            [-90.27096005, 38.63411217],
+            [-90.2431005, 38.6303475],
+            [-90.2470013, 38.6192146],
+            [-90.27227390, 38.62250509]
+        ]
+    },
+    'CWE': { coordinates: [...] }, // Add appropriate coordinates for each dataset
+    'BH': { coordinates: [...] },
+    'North': { coordinates: [...] },
+    'BR': { coordinates: [...] },
+    'DT': { coordinates: [...] }
+};
+
+const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
+
+const updateDropdowns = (dataset) => {
+    const options = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
+    document.getElementById('selectA').innerHTML = options;
+    document.getElementById('selectB').innerHTML = years.map(year => `<option value="${dataset}_${year}.jpg" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
+};
+
+const updateMap = (map, dataset, year) => {
+    const sourceId = `${map.getContainer().id}-overlay`;
+    const imgUrl = `https://adoucett.github.io/swipe/stl/${dataset}_${year}.jpg`;
+    const coordinates = datasets[dataset].coordinates;
+
+    if (map.getSource(sourceId)) {
+        map.getSource(sourceId).updateImage({ url: imgUrl, coordinates });
+    } else {
+        map.addSource(sourceId, {
+            type: 'image',
+            url: imgUrl,
+            coordinates: coordinates
+        });
+        map.addLayer({
+            id: sourceId,
+            source: sourceId,
+            type: 'raster',
+            paint: { 'raster-opacity': 1 }
+        });
+    }
+};
+
+const datasetSelect = document.getElementById('dataset');
+const selectA = document.getElementById('selectA');
+const selectB = document.getElementById('selectB');
+
+datasetSelect.addEventListener('change', () => {
+    const dataset = datasetSelect.value;
+    updateDropdowns(dataset);
+    updateMap(beforeMap, dataset, selectA.value.split('_')[1].split('.')[0]);
+    updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
+});
+
+selectA.addEventListener('change', () => {
+    const dataset = datasetSelect.value;
+    updateMap(beforeMap, dataset, selectA.value.split('_')[1].split('.')[0]);
+});
+
+selectB.addEventListener('change', () => {
+    const dataset = datasetSelect.value;
+    updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
+});
+
+const beforeMap = new mapboxgl.Map({
+    container: 'before',
+    style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+    center: [-90.258442, 38.626422],
+    zoom: 12
+});
+
+const afterMap = new mapboxgl.Map({
+    container: 'after',
+    style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+    center: [-90.258442, 38.626422],
+    zoom: 12
+});
+
+beforeMap.on('load', () => {
+    const dataset = datasetSelect.value;
+    updateMap(beforeMap, dataset, selectA.value.split('_')[1].split('.')[0]);
+});
+
+afterMap.on('load', () => {
+    const dataset = datasetSelect.value;
+    updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
+});
+
+const container = '#comparison-container';
+const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
+    // Set this to enable comparing two maps by mouse movement:
+    // mousemove: true
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateDropdowns(datasetSelect.value);
+});
+
+    </script>
 </body>
 </html>
