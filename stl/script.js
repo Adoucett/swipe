@@ -13,10 +13,10 @@ const datasets = {
     },
     'CWE': { 
         coordinates: [
-            [-90.26590405, 38.64820128],
-            [-90.2309325, 38.6409926],
-            [-90.2710217, 38.6319911],
-            [-90.2365457, 38.6249927]
+            [-90.265791, 38.648148],
+            [-90.230907, 38.641031],
+            [-90.236500, 38.625070],
+            [-90.270842, 38.631979]
         ],
         center: [-90.250721, 38.636425]  //38.636425,-90.250721
     },
@@ -59,6 +59,7 @@ const datasets = {
 };
 
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
+const flyToSpeed = 0.8; // Adjust this value to control the flyTo speed
 
 const updateDropdowns = (dataset) => {
     const options = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
@@ -91,7 +92,8 @@ const updateMap = (map, dataset, year) => {
 const recenterMap = (map, center) => {
     map.flyTo({
         center: center,
-        zoom: 12
+        zoom: 14,
+        speed: flyToSpeed
     });
 };
 
@@ -122,14 +124,18 @@ const beforeMap = new mapboxgl.Map({
     container: 'before',
     style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
     center: [-90.258442, 38.626422],
-    zoom: 12
+    zoom: 14,
+    maxZoom: 18,
+    maxPitch: 45
 });
 
 const afterMap = new mapboxgl.Map({
     container: 'after',
     style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
     center: [-90.258442, 38.626422],
-    zoom: 12
+    zoom: 14,
+    maxZoom: 18,
+    maxPitch: 45
 });
 
 beforeMap.on('load', () => {
