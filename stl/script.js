@@ -9,7 +9,6 @@ const datasets = {
             [-90.27227390, 38.62250509] // Bottom-left coordinates 
         ],
         center: [-90.258442, 38.626422]
-
     },
     'CWE': { 
         coordinates: [
@@ -97,6 +96,54 @@ const recenterMap = (map, center) => {
     });
 };
 
+const handleContextLoss = (map) => {
+    map.on('webglcontextlost', (event) => {
+        event.preventDefault();
+        console.warn('WebGL context lost. Attempting to restore...');
+        map.resize(); // Trigger a resize to force a re-render
+    });
+
+    map.on('webglcontextrestored', () => {
+        console.log('WebGL context restored.');
+        // Reinitialize resources or update map as needed
+        const dataset = datasetSelect.value;
+        updateMap(map, dataset, selectA.value.split('_')[1].split('.')[0]);
+        updateMap(map, dataset, selectB.value.split('_')[1].split('.')[0]);
+    });
+};
+
+const initializeMap = (containerId) => {
+    const map = new mapboxgl.Map({
+        container: containerId,
+        style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+        center: [-90.258442, 38.626422],
+        zoom: 14,
+        maxZoom: 18,
+        maxPitch: 45
+    });
+
+    handleContextLoss(map);
+    return map;
+};
+
+const beforeMap = initializeMap('before');
+const afterMap = initializeMap('after');
+
+beforeMap.on('load', () => {
+    const dataset = datasetSelect.value;
+    updateMap(beforeMap, dataset, selectA.value.split('_')[1].split('.')[0]);
+});
+
+afterMap.on('load', () => {
+    const dataset = datasetSelect.value;
+    updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
+});
+
+const container = '#comparison-container';
+const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
+    // mousemove: true
+});
+
 const datasetSelect = document.getElementById('dataset');
 const selectA = document.getElementById('selectA');
 const selectB = document.getElementById('selectB');
@@ -118,40 +165,6 @@ selectA.addEventListener('change', () => {
 selectB.addEventListener('change', () => {
     const dataset = datasetSelect.value;
     updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
-});
-
-const beforeMap = new mapboxgl.Map({
-    container: 'before',
-    style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
-    center: [-90.258442, 38.626422],
-    zoom: 14,
-    maxZoom: 18,
-    maxPitch: 45
-});
-
-const afterMap = new mapboxgl.Map({
-    container: 'after',
-    style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
-    center: [-90.258442, 38.626422],
-    zoom: 14,
-    maxZoom: 18,
-    maxPitch: 45
-});
-
-beforeMap.on('load', () => {
-    const dataset = datasetSelect.value;
-    updateMap(beforeMap, dataset, selectA.value.split('_')[1].split('.')[0]);
-});
-
-afterMap.on('load', () => {
-    const dataset = datasetSelect.value;
-    updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
-});
-
-const container = '#comparison-container';
-const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
-    // Set this to enable comparing two maps by mouse movement:
-    // mousemove: true
 });
 
 document.addEventListener('DOMContentLoaded', () => {
