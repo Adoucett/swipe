@@ -3,10 +3,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYWRvdWNldHQiLCJhIjoiY2lvZDFsc2lwMDRnd3Zha2pne
 const datasets = {
     'FP': {
         coordinates: [
-            [-90.27096005, 38.63411217], // Top-left coordinates 
-            [-90.2431005, 38.6303475], // Top-right coordinates 
-            [-90.2470013, 38.6192146], // Bottom-right coordinates 
-            [-90.27227390, 38.62250509] // Bottom-left coordinates 
+            [-90.27096005, 38.63411217],
+            [-90.2431005, 38.6303475],
+            [-90.2470013, 38.6192146],
+            [-90.27227390, 38.62250509]
         ],
         center: [-90.258442, 38.626422]
     },
@@ -17,7 +17,7 @@ const datasets = {
             [-90.236500, 38.625070],
             [-90.270842, 38.631979]
         ],
-        center: [-90.250721, 38.636425]  //38.636425,-90.250721
+        center: [-90.250721, 38.636425]
     },
     'BH': { 
         coordinates: [
@@ -35,13 +35,13 @@ const datasets = {
             [-90.200687, 38.631054],
             [-90.261727, 38.643822]
         ],
-        center: [-90.226696, 38.651965]      
+        center: [-90.226696, 38.651965]
     },
     'BR': { 
         coordinates: [
-            [-90.408615, 38.787284], //
-            [-90.366705, 38.743807], // 
-            [-90.397779, 38.726356], // 
+            [-90.408615, 38.787284],
+            [-90.366705, 38.743807],
+            [-90.397779, 38.726356],
             [-90.438472, 38.769331]
         ],
         center: [-90.401009, 38.752261]
@@ -58,7 +58,7 @@ const datasets = {
 };
 
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
-const flyToSpeed = 0.8; // Adjust this value to control the flyTo speed
+const flyToSpeed = 0.8;
 
 const updateDropdowns = (dataset) => {
     const options = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
@@ -71,21 +71,25 @@ const updateMap = (map, dataset, year) => {
     const imgUrl = `https://adoucett.github.io/swipe/stl/${dataset}_${year}.jpg`;
     const coordinates = datasets[dataset].coordinates;
 
-    if (map.getSource(sourceId)) {
-        map.getSource(sourceId).updateImage({ url: imgUrl, coordinates });
-    } else {
-        map.addSource(sourceId, {
-            type: 'image',
-            url: imgUrl,
-            coordinates: coordinates
-        });
-        map.addLayer({
-            id: sourceId,
-            source: sourceId,
-            type: 'raster',
-            paint: { 'raster-opacity': 1 }
-        });
-    }
+    const image = new Image();
+    image.onload = () => {
+        if (map.getSource(sourceId)) {
+            map.getSource(sourceId).updateImage({ url: imgUrl, coordinates });
+        } else {
+            map.addSource(sourceId, {
+                type: 'image',
+                url: imgUrl,
+                coordinates: coordinates
+            });
+            map.addLayer({
+                id: sourceId,
+                source: sourceId,
+                type: 'raster',
+                paint: { 'raster-opacity': 1 }
+            });
+        }
+    };
+    image.src = imgUrl;
 };
 
 const recenterMap = (map, center) => {
@@ -105,7 +109,6 @@ const handleContextLoss = (map) => {
 
     map.on('webglcontextrestored', () => {
         console.log('WebGL context restored.');
-        // Reinitialize resources or update map as needed
         const dataset = datasetSelect.value;
         updateMap(map, dataset, selectA.value.split('_')[1].split('.')[0]);
         updateMap(map, dataset, selectB.value.split('_')[1].split('.')[0]);
@@ -123,25 +126,23 @@ const initializeMap = (containerId) => {
     });
 
     handleContextLoss(map);
+
+    map.on('load', () => {
+        const dataset = datasetSelect.value;
+        updateMap(map, dataset, selectA.value.split('_')[1].split('.')[0]);
+        updateMap(map, dataset, selectB.value.split('_')[1].split('.')[0]);
+    });
+
     return map;
 };
 
 const beforeMap = initializeMap('before');
 const afterMap = initializeMap('after');
 
-beforeMap.on('load', () => {
-    const dataset = datasetSelect.value;
-    updateMap(beforeMap, dataset, selectA.value.split('_')[1].split('.')[0]);
-});
-
-afterMap.on('load', () => {
-    const dataset = datasetSelect.value;
-    updateMap(afterMap, dataset, selectB.value.split('_')[1].split('.')[0]);
-});
-
 const container = '#comparison-container';
-const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
-    // mousemove: true
+const compare = new mapboxgl.Compare(beforeMap, afterMap, container, {
+    mousemove: true,
+    orientation: 'vertical'
 });
 
 const datasetSelect = document.getElementById('dataset');
