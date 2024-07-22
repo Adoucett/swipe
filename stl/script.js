@@ -55,11 +55,20 @@ const datasets = {
             [-90.220437, 38.620755]
         ],
         center: [-90.198697, 38.627324]
+    },
+    'BP': { 
+        coordinates: [
+            [-90.191125, 38.623239],
+            [-90.191125, 38.623239],
+            [-90.186624, 38.619260],
+            [-90.191125, 38.623239] 
+        ],
+        center: [-90.19091, 38.623404] 
     }
 };
 
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
-const flyToSpeed = 0.8; // Adjust this value to control the flyTo speed
+const flyToSpeed = 0.75; // Adjust this value to control the flyTo speed
 
 const updateDropdowns = (dataset) => {
     const options = years.map(year => `<option value="${dataset}_${year}.jpg">${year}</option>`).join('');
@@ -92,7 +101,7 @@ const updateMap = (map, dataset, year) => {
 const recenterMap = (map, center) => {
     map.flyTo({
         center: center,
-        zoom: 14,
+        zoom: 14.5,
         speed: flyToSpeed
     });
 };
