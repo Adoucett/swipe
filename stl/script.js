@@ -58,10 +58,10 @@ const datasets = {
     },
     'BP': { 
         coordinates: [
-            [-90.191125, 38.623239],
-            [-90.191125, 38.623239],
-            [-90.186624, 38.619260],
-            [-90.191125, 38.623239] 
+            [-90.195703, 38.627368],
+            [-90.184332, 38.624531],
+            [-90.186652, 38.619196],
+            [-90.191125, 38.623239]
         ],
         center: [-90.19091, 38.623404] 
     }
@@ -134,7 +134,7 @@ const beforeMap = new mapboxgl.Map({
     style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
     center: [-90.258442, 38.626422],
     zoom: 15,
-    maxZoom: 18,
+    maxZoom: 18.5,
     maxPitch: 45
 });
 
@@ -143,7 +143,7 @@ const afterMap = new mapboxgl.Map({
     style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
     center: [-90.258442, 38.626422],
     zoom: 15,
-    maxZoom: 18,
+    maxZoom: 18.5,
     maxPitch: 45
 });
 
