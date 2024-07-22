@@ -78,7 +78,7 @@ const updateDropdowns = (dataset) => {
 
 const updateMap = (map, dataset, year) => {
     const sourceId = `${map.getContainer().id}-overlay`;
-    const imgUrl = `https://adoucett.github.io/swipe/stl/${dataset}_${year}.jpg`;
+    const imgUrl = `${dataset}_${year}.jpg`;
     const coordinates = datasets[dataset].coordinates;
 
     if (map.getSource(sourceId)) {
@@ -133,7 +133,7 @@ const beforeMap = new mapboxgl.Map({
     container: 'before',
     style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
     center: [-90.258442, 38.626422],
-    zoom: 14,
+    zoom: 15,
     maxZoom: 18,
     maxPitch: 45
 });
@@ -142,7 +142,7 @@ const afterMap = new mapboxgl.Map({
     container: 'after',
     style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
     center: [-90.258442, 38.626422],
-    zoom: 14,
+    zoom: 15,
     maxZoom: 18,
     maxPitch: 45
 });
