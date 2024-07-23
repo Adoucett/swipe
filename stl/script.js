@@ -72,9 +72,10 @@ const datasets = {
             [-90.229445, 38.563335],
             [-90.273258, 38.569047]
         ],
-        center: [-90.247926, 38.577028] 
-
+        center: [-90.247926, 38.577028]
+}
 };
+
 
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
 const flyToSpeed = 0.75; // Adjust this value to control the flyTo speed
