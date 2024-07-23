@@ -131,7 +131,7 @@ selectB.addEventListener('change', () => {
 
 const beforeMap = new mapboxgl.Map({
     container: 'before',
-    style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+    style: 'mapbox://styles/adoucett/clytjfrff006j01pafko44d0y',
     center: [-90.258442, 38.626422],
     zoom: 15,
     maxZoom: 18.5,
@@ -140,7 +140,7 @@ const beforeMap = new mapboxgl.Map({
 
 const afterMap = new mapboxgl.Map({
     container: 'after',
-    style: 'mapbox://styles/adoucett/clysuaj18003u01paax2cd5da',
+    style: 'mapbox://styles/adoucett/clytjfrff006j01pafko44d0y',
     center: [-90.258442, 38.626422],
     zoom: 15,
     maxZoom: 18.5,
