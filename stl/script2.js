@@ -18,7 +18,18 @@ const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022,
 const flyToSpeed = 0.75;
 
 const arcgisUrls = {
-    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer'
+    2002: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2002/MapServer',
+    2004: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2004/MapServer',
+    2006: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2006/MapServer',
+    2008: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2008/MapServer',
+    2010: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2010/MapServer',
+    2012: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2012/MapServer',
+    2014: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2014/MapServer',
+    2016: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2016/MapServer',
+    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer',
+    2020: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2020/MapServer',
+    2022: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2022/MapServer',
+    2024: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2024/MapServer'
     // Add more URLs for different years as needed
 };
 
