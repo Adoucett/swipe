@@ -11,7 +11,7 @@ const datasets = {
     'DU': { center: [-90.2492363, 38.5764495] }
 };
 
-const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
+const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018];
 const flyToSpeed = 0.75;
 
 const arcgisUrls = {
@@ -23,17 +23,17 @@ const arcgisUrls = {
     2012: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2012/MapServer',
     2014: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2014/MapServer',
     2016: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2016/MapServer',
-    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer',
-    2020: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2020/MapServer',
-    2022: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2022/MapServer',
-    2024: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2024/MapServer'
+    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer'
+   // 2020: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2020/MapServer',
+//    2022: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2022/MapServer',
+//    2024: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2024/MapServer'
     // Add more URLs for different years as needed
 };
 
 const updateDropdowns = (dataset) => {
     const options = years.map(year => `<option value="${year}">${year}</option>`).join('');
     document.getElementById('selectA').innerHTML = options;
-    document.getElementById('selectB').innerHTML = years.map(year => `<option value="${year}" ${year === 2024 ? 'selected' : ''}>${year}</option>`).join('');
+    document.getElementById('selectB').innerHTML = years.map(year => `<option value="${year}" ${year === 2018 ? 'selected' : ''}>${year}</option>`).join('');
 };
 
 const updateMap = (map, year) => {
@@ -56,6 +56,14 @@ const updateMap = (map, year) => {
         type: 'raster',
         paint: { 'raster-opacity': 1 }
     });
+
+
+
+
+
+
+
+
 };
 
 const recenterMap = (map, center) => {
