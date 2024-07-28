@@ -1,4 +1,7 @@
-mapboxgl.accessToken = 'pk.eyJ1IjoiYWRvdWNldHQiLCJhIjoiY2lvZDFsc2lwMDRnd3Zha2pneWpxcHh6biJ9.sbWgw2zPGyScsp-r4CYQnA';
+//Styleset: mapbox://styles/adoucett/clytjfrff006j01pafko44d0y
+
+
+mapboxgl.accessToken = 'your_mapbox_access_token';
 
 const datasets = {
     'FP': { center: [-90.258442, 38.626422] },
@@ -11,23 +14,13 @@ const datasets = {
     'DU': { center: [-90.2492363, 38.5764495] }
 };
 
-const wmtsUrls = {
-    2002: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2002/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2004: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2004/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2006: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2006/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2008: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2008/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2010: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2010/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2012: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2012/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2014: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2014/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2016: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2016/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2020: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2020/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2022: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2022/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',
-    2024: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2024/MapServer/WMTS/1.0.0/WMTSCapabilities.xml'
-};
-
 const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024];
-const flyToSpeed = 0.75; // Adjust this value to control the flyTo speed
+const flyToSpeed = 0.75;
+
+const arcgisUrls = {
+    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer'
+    // Add more URLs for different years as needed
+};
 
 const updateDropdowns = (dataset) => {
     const options = years.map(year => `<option value="${year}">${year}</option>`).join('');
@@ -36,7 +29,7 @@ const updateDropdowns = (dataset) => {
 };
 
 const updateMap = (map, year) => {
-    const sourceId = `${map.getContainer().id}-wmts`;
+    const sourceId = `${map.getContainer().id}-arcgis`;
 
     if (map.getSource(sourceId)) {
         map.removeLayer(sourceId);
@@ -45,7 +38,7 @@ const updateMap = (map, year) => {
 
     map.addSource(sourceId, {
         type: 'raster',
-        tiles: [`https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials${year}/MapServer/tile/{z}/{y}/{x}`],
+        tiles: [`${arcgisUrls[year]}/tile/{z}/{y}/{x}`],
         tileSize: 256
     });
 
@@ -121,3 +114,5 @@ const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
 document.addEventListener('DOMContentLoaded', () => {
     updateDropdowns(datasetSelect.value);
 });
+
+///
