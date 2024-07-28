@@ -1,7 +1,5 @@
-//Styleset: mapbox://styles/adoucett/clytjfrff006j01pafko44d0y
 
-
-mapboxgl.accessToken = 'your_mapbox_access_token';
+mapboxgl.accessToken = 'pk.eyJ1IjoiYWRvdWNldHQiLCJhIjoiY2lvZDFsc2lwMDRnd3Zha2pneWpxcHh6biJ9.sbWgw2zPGyScsp-r4CYQnA';
 
 const datasets = {
     'FP': { center: [-90.258442, 38.626422] },
