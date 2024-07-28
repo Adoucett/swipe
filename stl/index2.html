@@ -1,40 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Compare Tool</title>
+    <meta charset="utf-8">
+    <title>Swipe between Years - STL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="gl-compare.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container" id="image-compare-container">
-        <div class="img-container">
-            <img id="imgB" src="FP_2024.jpg" class="img imgB">
-        </div>
-        <div class="img-container img-wrapper" id="img-wrapper">
-            <img id="imgA" src="FP_2002.jpg" class="img imgA">
-        </div>
-        <div class="slider" id="slider" style="left: 50%;"></div>
-        <div class="dropdown-container">
-            <label for="dataset">Dataset:</label>
-            <select id="dataset" class="dropdown">
-                <option value="FP">Forest Park Southeast</option>
-                <option value="CWE">Central West End</option>
-                <option value="BH">Botanical Heights</option>
-                <option value="North">North City</option>
-                <option value="BR">Bridgeton/Airport</option>
-                <option value="DT">Downtown</option>
-            </select>
-            <select id="selectA" class="dropdown"></select>
-        </div>
+    <div class="dropdown-container">
+        <label for="dataset">Dataset:</label>
+        <select id="dataset" class="dropdown">
+            <option value="FP">Forest Park Southeast</option>
+            <option value="CWE">Central West End</option>
+            <option value="BH">Botanical Heights</option>
+            <option value="DU">Dutchtown</option>
+            <option value="North">North City</option>
+            <option value="BR">Bridgeton/Airport</option>
+            <option value="DT">Downtown</option>
+            <option value="BP">Ballpark Village</option>
+        </select>
+        <label for="selectA">Year Left:</label>
+        <select id="selectA" class="dropdown"></select>
+        <label for="selectB">Year Right:</label>
         <select id="selectB" class="dropdown"></select>
-        <div class="zoom-container">
-            <button id="zoom-in" class="zoom-button">Zoom In</button>
-            <button id="zoom-out" class="zoom-button">Zoom Out</button>
-            <button id="reset-view" class="zoom-button">Reset View</button>
-
-        </div>
     </div>
-    <script src="script.js"></script>
+    <div id="comparison-container">
+        <div id="before" class="map"></div>
+        <div id="after" class="map"></div>
+    </div>
+    <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+    <script defer src="gl-compare.js"></script>
+    <script defer src="script2.js"></script>
 </body>
 </html>
