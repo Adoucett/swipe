@@ -15,19 +15,16 @@ const years = [2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018];
 const flyToSpeed = 0.75;
 
 const arcgisUrls = {
-    2002: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2002/MapServer',
-    2004: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2004/MapServer',
-    2006: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2006/MapServer',
-    2008: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2008/MapServer',
-    2010: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2010/MapServer',
-    2012: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2012/MapServer',
-    2014: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2014/MapServer',
-    2016: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2016/MapServer',
-    2018: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2018/MapServer'
-   // 2020: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2020/MapServer',
-//    2022: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2022/MapServer',
-//    2024: 'https://maps.stlouisco.com/arcgis/rest/services/Aerials/Aerials2024/MapServer'
-    // Add more URLs for different years as needed
+    2002: 'Aerials2002',
+    2004: 'Aerials2004',
+    2006: 'Aerials2006',
+    2008: 'Aerials2008',
+    2010: 'Aerials2010',
+    2012: 'Aerials2012',
+    2014: 'Aerials2014',
+    2016: 'Aerials2016',
+    2018: 'Aerials2018',
+ //   Mosaic_2018: 'Mosaic_2018'
 };
 
 const updateDropdowns = (dataset) => {
@@ -37,7 +34,10 @@ const updateDropdowns = (dataset) => {
 };
 
 const updateMap = (map, year) => {
-    const sourceId = `${map.getContainer().id}-arcgis`;
+    const sourceId = `${arcgisUrls[year]}-arcgis`;
+    const url = `https://maps.stlouisco.com/arcgis/rest/services/Aerials/`;
+
+//`https://maps.stlouisco.com/arcgis/rest/services/Aerials/${arcgisUrls[year]}/MapServer`;
 
     if (map.getSource(sourceId)) {
         map.removeLayer(sourceId);
@@ -46,7 +46,7 @@ const updateMap = (map, year) => {
 
     map.addSource(sourceId, {
         type: 'raster',
-        tiles: [`${arcgisUrls[year]}/tile/{z}/{y}/{x}`],
+    //    tiles: [`${url}/tile/{z}/{y}/{x}`],
         tileSize: 256
     });
 
@@ -56,14 +56,6 @@ const updateMap = (map, year) => {
         type: 'raster',
         paint: { 'raster-opacity': 1 }
     });
-
-
-
-
-
-
-
-
 };
 
 const recenterMap = (map, center) => {
@@ -130,5 +122,3 @@ const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
 document.addEventListener('DOMContentLoaded', () => {
     updateDropdowns(datasetSelect.value);
 });
-
-///
